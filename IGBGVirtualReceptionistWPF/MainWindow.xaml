@@ -1,0 +1,33 @@
+﻿<Window x:Class="IGBGVirtualReceptionist.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:IGBGVirtualReceptionist"
+        xmlns:Controls="clr-namespace:IGBGVirtualReceptionist.CustomControls"
+        xmlns:ig="http://schemas.infragistics.com/xaml"
+        mc:Ignorable="d"
+        Title="IG BG Virtual Receptionist" WindowState="Maximized">
+    <Grid Name="rootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Image Source="/Images/IGLogo.png"/>
+        <Label Grid.Column="1" FontSize="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">IG BG Virtual Receptionist</Label>
+        <!--<TextBox Name="txtSearch" Grid.Row="1" Grid.Column="0" BorderBrush="Brown"/>
+        <Button Name="btnSearch" Grid.Row="1" Grid.Column="1" Content="Search" Width="50"/>-->
+        
+     <ig:XamComboEditor Name="PersonComboEditor" Grid.Row="2" Grid.Column="0" IsEditable="True" ItemsSource="{Binding Persons}" DisplayMemberPath="Name"/>
+        
+
+    </Grid>
+</Window>
