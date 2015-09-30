@@ -77,5 +77,13 @@ namespace IGBGVirtualReceptionist
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
         }
+
+        private void PersonComboEditor_SelectionChanged(object sender, Infragistics.Controls.Editors.SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0)
+                gridPersonDetailsPanel.Visibility = System.Windows.Visibility.Visible;
+            else
+                gridPersonDetailsPanel.Visibility = System.Windows.Visibility.Collapsed;
+        }
     }
 }
