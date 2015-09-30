@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using IGBGVirtualReceptionist.LyncCommunication;
 
 namespace IGBGVirtualReceptionist
 {
@@ -36,6 +37,9 @@ namespace IGBGVirtualReceptionist
             Persons.Add(new Person() { Name = "Mayeble Own", Age = 20 });
 
             this.DataContext = this;
+
+            var lyncService = new LyncService();
+            lyncService.Initialize();
         }
 
         private List<Person> _searchResults;
