@@ -9,11 +9,9 @@
         Title="IG BG Virtual Receptionist" WindowState="Maximized">
     <Grid Name="rootGrid">
         <Grid.RowDefinitions>
-            <RowDefinition/>
+            <RowDefinition Height="100"/>
             <RowDefinition Height="40"/>
             <RowDefinition Height="30"/>
-            <RowDefinition/>
-            <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -22,11 +20,58 @@
         </Grid.ColumnDefinitions>
         <Image Source="/Images/IGLogo.png"/>
         <Label Grid.Column="1" FontSize="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">IG BG Virtual Receptionist</Label>
-        <!--<TextBox Name="txtSearch" Grid.Row="1" Grid.Column="0" BorderBrush="Brown"/>
-        <Button Name="btnSearch" Grid.Row="1" Grid.Column="1" Content="Search" Width="50"/>-->
-        
-     <ig:XamComboEditor Name="PersonComboEditor" Grid.Row="2" Grid.Column="0" IsEditable="True" ItemsSource="{Binding Persons}" DisplayMemberPath="Name"/>
-        
+        <ig:XamComboEditor Name="PersonComboEditor" Grid.Row="2" Grid.Column="0" IsEditable="True" ItemsSource="{Binding Persons}" DisplayMemberPath="Name" EmptyText="Search here..." SelectionChanged="PersonComboEditor_SelectionChanged" />
+
+        <Grid x:Name="gridPersonDetailsPanel" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" Margin="0, 30, 0, 0" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Image x:Name="personPhoto" Height="100" Source="Images/IgLogo.png" Grid.Row="0" Grid.RowSpan="2"/>
+
+            <Label x:Name="lblStatus" Content="Status" Grid.Row="2" Grid.Column="0" />
+            <TextBlock x:Name="personStatus" Grid.Row="3" Grid.Column="0"/>
+            <Label x:Name="lblLocation" Content="Location" Grid.Row="4" Grid.Column="0"/>
+            <TextBlock x:Name="personLocation" Grid.Row="5" Grid.Column="0"/>
+            <Label x:Name="lblFirstName" Content="First Name" Grid.Row="0" Grid.Column="1" />
+            <TextBlock x:Name="personFirstName" Grid.Row="1" Grid.Column="1" Text="{Binding ElementName=PersonComboEditor, Path=SelectedItem.Name}"/>
+            <Label x:Name="lblLastName" Content="Last Name" Grid.Row="2" Grid.Column="1"/>
+            <TextBlock x:Name="personLastName" Grid.Row="3" Grid.Column="1"/>
+            <Label x:Name="lblTitle" Content="Title" Grid.Row="4" Grid.Column="1" />
+            <TextBlock x:Name="personTitle" Grid.Row="5" Grid.Column="1"/>
+            <Label x:Name="lblTeam" Content="Team" Grid.Row="6" Grid.Column="1"/>
+            <TextBlock x:Name="personTeam" Grid.Row="3" Grid.Column="1"/>
+
+            <!--Buttons-->
+            <Button Grid.Row="8" Grid.Column="0" x:Name="btnAudioCallPerson" Content="Audio Call" HorizontalAlignment="Left"/>
+            <Button Grid.Row="8" Grid.Column="1" x:Name="btnVideoCallPerson" Content="Video Call" HorizontalAlignment="Left"/>
+        </Grid>
+
+        <Grid Name="Favorities" Grid.Row="3" Grid.Column="2">
+            <StackPanel >
+                <Label Content="Favorites"/>
+                <Separator/>
+                <Button Content="Human Resources" />
+                <Separator/>
+                <Button Content="Office Assitant" />
+                <Separator/>
+                <Button Content="Office Manager"/>
+            </StackPanel>
+        </Grid>
+
 
     </Grid>
 </Window>
