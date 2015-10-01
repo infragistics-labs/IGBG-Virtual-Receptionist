@@ -83,8 +83,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="LyncCommunication\ContactInfo.cs" />
     <Compile Include="LyncCommunication\LyncModelExceptionHelper.cs" />
     <Compile Include="LyncCommunication\LyncService.cs" />
+    <Compile Include="LyncCommunication\SearchContactsEventArgs.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

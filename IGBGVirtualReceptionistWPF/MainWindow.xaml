@@ -61,7 +61,8 @@
         </Grid>
 
         <Grid Name="Favorities" Grid.Row="3" Grid.Column="2">
-            <StackPanel >
+            
+            <!--<StackPanel >
                 <Label Content="Favorites"/>
                 <Separator/>
                 <Button Content="Human Resources" />
@@ -69,7 +70,7 @@
                 <Button Content="Office Assitant" />
                 <Separator/>
                 <Button Content="Office Manager"/>
-            </StackPanel>
+            </StackPanel>-->
         </Grid>
 
 

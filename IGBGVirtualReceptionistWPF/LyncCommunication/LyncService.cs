@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Windows;
 using Microsoft.Lync.Model;
 using System;
 using System.Linq;
@@ -8,12 +10,18 @@ namespace IGBGVirtualReceptionist.LyncCommunication
 {
     public class LyncService : IDisposable
     {
+        private const int MaxContactSearchResults = 20;
+
         private LyncClient client;
         private bool thisInitializedLync = false;
+        private bool expertSearchEnabled = false;
+        private IList<SearchProviders> activeSearchProviders;
 
         public event EventHandler<ClientStateChangedEventArgs> ClientStateChanged;
         public event EventHandler ClientDisconnected;
+        public event EventHandler<SearchContactsEventArgs> SearchContactsFinished;
 
+        // TODO: put this in the constructor
         public void Initialize()
         {
             try
@@ -33,13 +41,13 @@ namespace IGBGVirtualReceptionist.LyncCommunication
                     }
                     catch (LyncClientException lyncClientException)
                     {
-                        Console.WriteLine("LyncService: " + lyncClientException);
+                        Console.WriteLine("LyncService: " + lyncClientException.Message);
                     }
                     catch (SystemException systemException)
                     {
                         if (LyncModelExceptionHelper.IsLyncException(systemException))
                         {
-                            Console.WriteLine("LyncService: " + systemException);
+                            Console.WriteLine("LyncService: " + systemException.Message);
                         }
                         else
                         {
@@ -50,6 +58,11 @@ namespace IGBGVirtualReceptionist.LyncCommunication
                 }
                 else //not in UI Suppression, so the client was already initialized
                 {
+                    if (this.client.InSuppressedMode == true && this.client.State != ClientState.SignedIn)
+                    {
+                        this.SingIn();
+                    }
+
                     //registers for conversation related events
                     //these events will occur when new conversations are created (incoming/outgoing) and removed
                    
@@ -64,7 +77,7 @@ namespace IGBGVirtualReceptionist.LyncCommunication
                 //if the Lync process is not running and UISuppressionMode=false these exception will be thrown
                 if (ex is ClientNotFoundException || ex is NotStartedByUserException)
                 {
-                    Console.WriteLine("LyncService: " + ex);
+                    Console.WriteLine("LyncService: " + ex.Message);
                     MessageBox.Show("Microsoft Lync does not appear to be running. Please start Lync.");
 
                     return;
@@ -78,6 +91,7 @@ namespace IGBGVirtualReceptionist.LyncCommunication
         {
             this.client.StateChanged -= this.Client_StateChanged;
             this.client.ClientDisconnected -= this.Client_ClientDisconnected;
+            this.client.ContactManager.SearchProviderStateChanged -= this.ContactManagerSearchProviderStateChanged;
 
             // TODO: 
             //this.client.ConversationManager.ConversationAdded -= this.ConversationManager_ConversationAdded;
@@ -97,6 +111,62 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             }
         }
 
+        public IEnumerable GetContacts()
+        {
+            //var subscription = this.client.ContactManager.CreateSubscription();
+
+            //var contacts = new List<ContactInfo>();
+
+            //foreach (var group in this.client.ContactManager.Groups)
+            //{
+            //    Console.WriteLine("LyncService: Getting contacts from group: " + group.Name);
+            //    foreach (var contact in group)
+            //    {
+            //        subscription.Contacts.Add(contact);
+
+            //        var ci = ContactInfo.GetContactInfo(contact);
+            //        contacts.Add(ci);
+            //    }
+            //}
+
+            //subscription.Subscribe(ContactSubscriptionRefreshRate.Low, new ContactInformationType[] { ContactInformationType.Availability, ContactInformationType.FirstName, ContactInformationType.LastName });
+
+            //return subscription.Contacts;
+            return null;
+        }
+
+        public void StartSearchForContactsOrGroups(string searchCriteria)
+        {
+            if (string.IsNullOrEmpty(searchCriteria) || this.client.State != ClientState.SignedIn)
+            {
+                return;
+            }
+
+            try
+            {
+                // Initiate search for entity based on name.
+                var searchFields = this.client.ContactManager.GetSearchFields();
+                object[] asyncState = { this.client.ContactManager, searchCriteria };
+
+                if (expertSearchEnabled)
+                {
+                    // Get the Sharepoint expert search URL with the user's search string query parameter.
+                    var sharePointSearchQueryString = this.client.ContactManager.GetExpertSearchQueryString(searchCriteria);
+
+                    this.client.ContactManager.BeginSearch(sharePointSearchQueryString, SearchProviders.Expert, searchFields,
+                        SearchOptions.Default, MaxContactSearchResults, this.SearchResultsCallback, asyncState);
+                }
+                else
+                {
+                    this.client.ContactManager.BeginSearch(searchCriteria, this.SearchResultsCallback, asyncState);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("LyncService Error: " + ex.Message);
+            }
+        }
+
         private void ClientInitialized(IAsyncResult result)
         {
             if (!result.IsCompleted)
@@ -108,9 +178,24 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             this.thisInitializedLync = true;
             this.client.EndInitialize(result);
 
+            this.activeSearchProviders = new List<SearchProviders>();
+
+            // Loads Expert search provider if it is configured
+            SearchProviderStatusType expertSearchProviderStatus = this.client.ContactManager.GetSearchProviderStatus(SearchProviders.Expert);
+            if (expertSearchProviderStatus == SearchProviderStatusType.SyncSucceeded ||
+                expertSearchProviderStatus == SearchProviderStatusType.SyncSucceededForExternalOnly ||
+                expertSearchProviderStatus == SearchProviderStatusType.SyncSucceededForInternalOnly)
+            {
+                this.activeSearchProviders.Add(SearchProviders.Expert);
+                this.expertSearchEnabled = true;
+            }
+
+            // Register for the SearchProviderStatusChanged event raised by ContactManager
+            this.client.ContactManager.SearchProviderStateChanged += this.ContactManagerSearchProviderStateChanged;
+
+
             //registers for conversation related events
             //these events will occur when new conversations are created (incoming/outgoing) and removed
-
             // TODO:
             //client.ConversationManager.ConversationAdded += ConversationManager_ConversationAdded;
             //client.ConversationManager.ConversationRemoved += ConversationManager_ConversationRemoved;
@@ -169,6 +254,15 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             }
         }
 
+        private void RaiseSearchContactsFinished(object sender, SearchContactsEventArgs e)
+        {
+            var handler = this.SearchContactsFinished;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
         private void Client_CredentialRequested(object sender, CredentialRequestedEventArgs e)
         {
             //If the server type is Lync server and sign in credentials
@@ -176,7 +270,7 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             if (e.Type == CredentialRequestedType.SignIn)
             {
                 //Re-submit sign in credentials
-                e.Submit("oracle@infragistics.com", "", true);
+                e.Submit("oracle@infragistics.com", "<provide password>", true);
             }
         }
 
@@ -191,6 +285,60 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             }, null);
 
             return tcs.Task;
+        }
+
+        private void ContactManagerSearchProviderStateChanged(object sender, SearchProviderStateChangedEventArgs e)
+        {
+            if (e.NewStatus != SearchProviderStatusType.SyncSucceeded)
+            {
+                // Remove the SearchProviders enumerator to the local application cache declared previously
+                activeSearchProviders.Remove(e.Provider);
+            }
+
+            // TODO: check which providers we will need. Do we need an external provider?
+            if (e.Provider == SearchProviders.Expert)
+            {
+                this.expertSearchEnabled = e.NewStatus == SearchProviderStatusType.SyncSucceeded ||
+                                           e.NewStatus == SearchProviderStatusType.SyncSucceededForExternalOnly ||
+                                           e.NewStatus == SearchProviderStatusType.SyncSucceededForInternalOnly;
+
+                if (this.expertSearchEnabled)
+                {
+                    if (!this.activeSearchProviders.Contains(SearchProviders.Expert))
+                        this.activeSearchProviders.Add(SearchProviders.Expert);
+                }
+                else
+                {
+                    if (this.activeSearchProviders.Contains(SearchProviders.Expert))
+                        this.activeSearchProviders.Remove(SearchProviders.Expert);
+                }
+            }
+        }
+
+        private void SearchResultsCallback(IAsyncResult ar)
+        {
+            // Check the state of search operation.
+            if (ar.IsCompleted == true)
+            {
+                object[] asyncState = (object[])ar.AsyncState;
+                try
+                {
+                    var results = ((ContactManager)asyncState[0]).EndSearch(ar);
+                    if (results.AllResults.Count != 0)
+                    {
+                        // Subscribe to the search results.
+                        // TODO:
+                        //SubscribeToSearchResults(results.Contacts.ToList());
+
+                        var contactDetails = results.Contacts.Select(x => ContactInfo.GetContactInfo(x));
+                        this.RaiseSearchContactsFinished(this, new SearchContactsEventArgs(contactDetails));
+                    }
+                }
+                catch (SearchException se)
+                {
+                    Console.WriteLine("LyncService Error: " + se.Message);
+                }
+            }
         }
     }
 }

@@ -41,7 +41,7 @@ namespace IGBGVirtualReceptionist
             this.DataContext = this;
 
             this.lyncService = new LyncService();
-            lyncService.Initialize();
+            this.lyncService.Initialize();
         }
 
         private List<Person> _searchResults;
@@ -82,7 +82,7 @@ namespace IGBGVirtualReceptionist
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            lyncService.Dispose();
+            this.lyncService.Dispose();
 
             base.OnClosing(e);
         }
@@ -93,6 +93,9 @@ namespace IGBGVirtualReceptionist
                 gridPersonDetailsPanel.Visibility = System.Windows.Visibility.Visible;
             else
                 gridPersonDetailsPanel.Visibility = System.Windows.Visibility.Collapsed;
+
+            //var aa = this.lyncService.GetContacts();
+            this.lyncService.StartSearchForContactsOrGroups("joe");
         }
     }
 }
