@@ -23,6 +23,8 @@ namespace IGBGVirtualReceptionist
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private LyncService lyncService;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -38,7 +40,7 @@ namespace IGBGVirtualReceptionist
 
             this.DataContext = this;
 
-            var lyncService = new LyncService();
+            this.lyncService = new LyncService();
             lyncService.Initialize();
         }
 
@@ -76,6 +78,13 @@ namespace IGBGVirtualReceptionist
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            lyncService.Dispose();
+
+            base.OnClosing(e);
         }
 
         private void PersonComboEditor_SelectionChanged(object sender, Infragistics.Controls.Editors.SelectionChangedEventArgs e)

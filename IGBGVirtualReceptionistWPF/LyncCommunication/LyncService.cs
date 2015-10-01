@@ -2,13 +2,14 @@
 using Microsoft.Lync.Model;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace IGBGVirtualReceptionist.LyncCommunication
 {
     public class LyncService : IDisposable
     {
         private LyncClient client;
-        private bool isLyncProcessInitializedByThisApp = false;
+        private bool thisInitializedLync = false;
 
         public event EventHandler<ClientStateChangedEventArgs> ClientStateChanged;
         public event EventHandler ClientDisconnected;
@@ -25,8 +26,6 @@ namespace IGBGVirtualReceptionist.LyncCommunication
                 //if this client is in UISuppressionMode and not yet initialized
                 if (client.InSuppressedMode && client.State == ClientState.Uninitialized)
                 {
-                    this.isLyncProcessInitializedByThisApp = true;
-
                     // initialize the client
                     try
                     {
@@ -75,7 +74,7 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             }
         }
 
-        public void Dispose()
+        public async void Dispose()
         {
             this.client.StateChanged -= this.Client_StateChanged;
             this.client.ClientDisconnected -= this.Client_ClientDisconnected;
@@ -83,6 +82,19 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             // TODO: 
             //this.client.ConversationManager.ConversationAdded -= this.ConversationManager_ConversationAdded;
             //this.client.ConversationManager.ConversationRemoved -= this.ConversationManager_ConversationRemoved;
+
+            if (this.client.InSuppressedMode && this.thisInitializedLync)
+            {
+                if (this.client.State == ClientState.SignedIn)
+                {
+                    await this.SignOut();
+                }
+                
+                if (this.client.State == ClientState.SignedOut)
+                {
+                    await this.ShutdownClient();
+                }
+            }
         }
 
         private void ClientInitialized(IAsyncResult result)
@@ -93,6 +105,8 @@ namespace IGBGVirtualReceptionist.LyncCommunication
                 return;
             }
 
+            this.thisInitializedLync = true;
+            this.client.EndInitialize(result);
 
             //registers for conversation related events
             //these events will occur when new conversations are created (incoming/outgoing) and removed
@@ -102,12 +116,47 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             //client.ConversationManager.ConversationRemoved += ConversationManager_ConversationRemoved;
         }
 
+        private Task SingIn()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            this.client.CredentialRequested += this.Client_CredentialRequested;
+
+            this.client.BeginSignIn(null, null, null, (ar) =>
+            {
+                this.client.EndSignIn(ar);
+
+                tcs.SetResult(true);
+            }, null);
+
+            return tcs.Task;
+        }
+
+        private Task SignOut()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            this.client.BeginSignOut((ar) =>
+            {
+                this.client.EndSignOut(ar);
+
+                tcs.SetResult(true);
+            }, null);
+
+            return tcs.Task;
+        }
+
         private void Client_StateChanged(object sender, ClientStateChangedEventArgs e)
         {
             var handler = this.ClientStateChanged;
             if (handler != null)
             {
                 handler(this, e);
+            }
+
+            if (e.NewState == ClientState.SignedOut && this.client.InSuppressedMode == true)
+            {
+                this.SingIn();
             }
         }
 
@@ -118,6 +167,30 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             {
                 handler(this, e);
             }
+        }
+
+        private void Client_CredentialRequested(object sender, CredentialRequestedEventArgs e)
+        {
+            //If the server type is Lync server and sign in credentials
+            //are needed.
+            if (e.Type == CredentialRequestedType.SignIn)
+            {
+                //Re-submit sign in credentials
+                e.Submit("oracle@infragistics.com", "", true);
+            }
+        }
+
+        private Task ShutdownClient()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            this.client.BeginShutdown((ar) =>
+            {
+                this.client.EndShutdown(ar);
+                tcs.SetResult(true);
+            }, null);
+
+            return tcs.Task;
         }
     }
 }
