@@ -29,7 +29,7 @@ namespace IGBGVirtualReceptionist
         {
             InitializeComponent();
 
-            this.ApplyThemes();
+            //this.ApplyThemes();
 
             this.client = client;
             this.conversation = conversation;
@@ -38,6 +38,11 @@ namespace IGBGVirtualReceptionist
             this.Title = contact.DisplayName;
 
             InitializeConversation();
+        }
+
+        public void InitiateAudioCall()
+        {
+            
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)

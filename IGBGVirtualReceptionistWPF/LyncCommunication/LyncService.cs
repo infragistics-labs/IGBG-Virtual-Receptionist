@@ -25,14 +25,22 @@ namespace IGBGVirtualReceptionist.LyncCommunication
         public event EventHandler<ClientStateChangedEventArgs> ClientStateChanged;
         public event EventHandler ClientDisconnected;
         public event EventHandler<SearchContactsEventArgs> SearchContactsFinished;
-        public event EventHandler<ConversationManagerEventArgs> ConversationStarted;
-        public event EventHandler<ConversationManagerEventArgs> ConversationEnded;
+        public event EventHandler<ConversationEventArgs> ConversationStarted;
+        public event EventHandler<ConversationEventArgs> ConversationEnded;
 
         public bool InUISuppressedMode
         {
             get
             {
                 return this.client.InSuppressedMode;
+            }
+        }
+
+        public LyncClient Client
+        {
+            get
+            {
+                return this.client;
             }
         }
 
@@ -256,9 +264,14 @@ namespace IGBGVirtualReceptionist.LyncCommunication
 
                 var hrCoordinatorInfo = ContactInfo.GetContactInfo(hrCoordinator);
                 this.favoriteContactInfos.Add(hrCoordinatorInfo);
+
+                if (this.searchResultSubscription == null)
+                {
+                    this.searchResultSubscription = this.client.ContactManager.CreateSubscription();
+                    this.searchResultSubscription.AddContacts(this.favoriteContacts);
+                }
             }
         }
-
 
         private void ClientInitialized(IAsyncResult result)
         {
@@ -477,7 +490,8 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             var handler = this.ConversationEnded;
             if (handler != null)
             {
-                handler(sender, e);
+                var contactInfo = this.GetParticipantInfoFromConversation(e.Conversation);
+                handler(sender, new ConversationEventArgs(e.Conversation, contactInfo));
             }
         }
 
@@ -486,8 +500,17 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             var handler = this.ConversationStarted;
             if (handler != null)
             {
-                handler(sender, e);
+                var contactInfo = this.GetParticipantInfoFromConversation(e.Conversation);
+                handler(sender, new ConversationEventArgs(e.Conversation, contactInfo));
             }
+        }
+
+        private ContactInfo GetParticipantInfoFromConversation(Conversation conversation)
+        {
+            var participant = conversation.Participants.First(x => !x.IsSelf);
+            var contactInfo = participant != null ? ContactInfo.GetContactInfo(participant.Contact) : null;
+
+            return contactInfo;
         }
     }
 }
