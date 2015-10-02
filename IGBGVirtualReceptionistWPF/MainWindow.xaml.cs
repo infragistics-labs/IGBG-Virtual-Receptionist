@@ -22,6 +22,8 @@ namespace IGBGVirtualReceptionist
         public MainWindow()
         {
             InitializeComponent();
+
+            ApplyThemes();
             Persons = new ObservableCollection<Person>();
 
             Persons.Add(new Person() { Name = "John Smith", Age = 20 });
@@ -53,6 +55,18 @@ namespace IGBGVirtualReceptionist
             MessageBox.Show("Conversation started!");
 
             e.Conversation.End();
+        }
+
+        private void ApplyThemes()
+        {
+            var assemblyFullName = this.GetType().Assembly.FullName;
+            var sourceUri = new Uri(string.Format("pack://application:,,,/{0};component/{1}", assemblyFullName, @"Themes\IG.MSControls.Core.Implicit.xaml"));
+
+            this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = sourceUri });
+            sourceUri = new Uri(string.Format("pack://application:,,,/{0};component/{1}", assemblyFullName, @"Themes\IG.xamTileManager.xaml"));
+
+            this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = sourceUri });
+
         }
 
         private void LyncServiceSearchContactsFinished(object sender, SearchContactsEventArgs e)
