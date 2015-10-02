@@ -6,6 +6,9 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Data;
+using IGBGVirtualReceptionist.LyncCommunication;
+using Microsoft.Lync.Model.Conversation;
 
 
 namespace IGBGVirtualReceptionist
@@ -29,7 +32,21 @@ namespace IGBGVirtualReceptionist
             this.lyncService = new LyncService();
             this.lyncService.ClientStateChanged += this.LyncServiceClientStateChanged;
             this.lyncService.SearchContactsFinished += this.LyncServiceSearchContactsFinished;
+            this.lyncService.ConversationStarted += this.LyncServiceConversationStarted;
+            this.lyncService.ConversationEnded += this.LyncServiceConversationEnded;
             this.favTiles.ItemsSource = lyncService.GetFavoriteContacts();
+        }
+
+        private void LyncServiceConversationEnded(object sender, ConversationManagerEventArgs e)
+        {
+            MessageBox.Show("Conversation ended!");
+        }
+
+        private void LyncServiceConversationStarted(object sender, ConversationManagerEventArgs e)
+        {
+            MessageBox.Show("Conversation started!");
+
+            e.Conversation.End();
         }
 
         private void ApplyThemes()
