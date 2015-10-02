@@ -49,7 +49,6 @@ namespace IGBGVirtualReceptionist
             this.DataContext = this;
 
             this.lyncService = new LyncService();
-            this.lyncService.Initialize();
             this.lyncService.ClientStateChanged += this.LyncServiceClientStateChanged;
             this.lyncService.SearchContactsFinished += this.LyncServiceSearchContactsFinished;
         }
