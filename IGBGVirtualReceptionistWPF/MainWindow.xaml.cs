@@ -27,6 +27,8 @@ namespace IGBGVirtualReceptionist
     {
         private LyncService lyncService;
 
+        private List<ContactInfo> currentSearchResults = new List<ContactInfo>();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -46,10 +48,25 @@ namespace IGBGVirtualReceptionist
 
             this.lyncService = new LyncService();
             this.lyncService.Initialize();
-            lyncService.ClientStateChanged += lyncService_ClientStateChanged;
+            this.lyncService.ClientStateChanged += this.LyncServiceClientStateChanged;
+            this.lyncService.SearchContactsFinished += this.LyncServiceSearchContactsFinished;
         }
 
-        void lyncService_ClientStateChanged(object sender, Microsoft.Lync.Model.ClientStateChangedEventArgs e)
+        private void LyncServiceSearchContactsFinished(object sender, SearchContactsEventArgs e)
+        {
+            // TODO: remove this list if not needed
+            //this.currentSearchResults.Clear();
+            //this.currentSearchResults.AddRange(e.FoundContacts);
+
+            // populate datasource
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
+                this.xamDataCards.DataSource = null;
+                this.xamDataCards.DataSource = e.FoundContacts;
+            }));
+        }
+
+        private void LyncServiceClientStateChanged(object sender, Microsoft.Lync.Model.ClientStateChangedEventArgs e)
         {
             Dispatcher.BeginInvoke((Action)(() =>
             {
@@ -114,37 +131,10 @@ namespace IGBGVirtualReceptionist
             base.OnClosing(e);
         }
 
-        public List<ContactInfo> contactInfo = new List<ContactInfo>();
-
         private void btnSearch_Click(object sender, RoutedEventArgs e)
         {
-         //   contactInfo.Clear();
-            //lyncService.results = null;
-            //Dispatcher.BeginInvoke((Action)(() =>
-            //{
-            //    this.lyncService.StartSearchForContactsOrGroups(searchBox.Text);
-
-            //    if (lyncService.results.Count != 0)
-            //    {
-            //        foreach (var item in lyncService.results)
-            //        {
-            //            contactInfo.Add(ContactInfo.GetContactInfo(item));
-
-            //        }
-            //    }
-
-            //    if (contactInfo.Count > 0)
-            //    {
-            //        xamDataCards.DataSource = null;
-            //        xamDataCards.DataSource = contactInfo;
-            //    }
-            //}));
+            this.lyncService.StartSearchForContactsOrGroups(searchBox.Text);
         }
-
-
-
-
-
 
         //  private void PersonComboEditor_SelectionChanged(object sender, Infragistics.Controls.Editors.SelectionChangedEventArgs e)
         //  {
