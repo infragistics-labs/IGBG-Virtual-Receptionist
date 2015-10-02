@@ -33,32 +33,32 @@
                 <DataTemplate>
                     <Border>
                         <StackPanel>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Image Source="{Binding PhotoImage}" Height="100" Width="100" Grid.Row="0"/>
-                            <Label Content="{Binding DisplayName}" Grid.Row="1"/>
-                            <Label Content="Availability:" Grid.Row="2" Grid.Column="0"/>
-                            <Label Content="{Binding Availability}" Grid.Row="2" Grid.Column="1"/>
-                                <StackPanel Grid.Row="3">
                             <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
                                     <ColumnDefinition/>
-                                    <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
-                                <Button Name="btnText"  Grid.Column="0" Content="Text" Command="{Binding TextCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding}"/>
-                                <Button Name="btnCall" Grid.Column="1" Content="Audio" Command="{Binding AudioCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding}"/>
-                                <Button Name="btnVideo"  Grid.Column="2" Content="Video" Command="{Binding VideoCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding}" />
-                            </Grid>
+                                <Image Source="{Binding PhotoImage}" Height="100" Width="100" Grid.Row="0"/>
+                                <Label Content="{Binding DisplayName}" Grid.Row="1"/>
+                                <Label Content="Availability:" Grid.Row="2" Grid.Column="0"/>
+                                <Label Content="{Binding Availability}" Grid.Row="2" Grid.Column="1"/>
+                                <StackPanel Grid.Row="3">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button Name="btnText"  Grid.Column="0" Content="Text" Command="{Binding TextCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding}"/>
+                                        <Button Name="btnCall" Grid.Column="1" Content="Audio" Command="{Binding AudioCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding}"/>
+                                        <Button Name="btnVideo"  Grid.Column="2" Content="Video" Command="{Binding VideoCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding}" />
+                                    </Grid>
                                 </StackPanel>
                             </Grid>
                         </StackPanel>
@@ -72,7 +72,8 @@
 
             <igDP:XamDataCards.ViewSettings>
                 <igDP:CardViewSettings HeaderPath="DisplayName"
-                                       HeaderVisibility="Visible" />
+                                       HeaderVisibility="Visible"
+                                       />
             </igDP:XamDataCards.ViewSettings>
             <igDP:XamDataCards.Resources>
                 <Style TargetType="{x:Type igDP:CellValuePresenter}">
@@ -207,8 +208,8 @@
                     <igDP:Field Name="LastName" Label="Last Name" Column="1" Row="2" Height="30"/>
                     <!--<igDP:Field Name="SipUri" Column="1" Row="3" Height="30"/>-->
                     <igDP:Field Name="Activity" Label="Status" Column="1" Row="3" Height="30"/>
-                    <igDP:Field Name="Title" Column="1" Row="4" Height="30"/>
-                    <igDP:Field Name="Department" Column="1" Row="5" Height="30"/>
+                    <igDP:Field Name="Title" Column="1" Row="4" Height="30" Width="200"/>
+                    <igDP:Field Name="Department" Column="1" Row="5" Height="30" />
                     <igDP:Field Name="Description" Column="1" Row="6" Height="30" Visibility="Collapsed"/>
                     <igDP:Field Name="OutOfficeNote" Column="1" Row="7" Height="30" Visibility="Collapsed"/>
                 </igDP:FieldLayout>
