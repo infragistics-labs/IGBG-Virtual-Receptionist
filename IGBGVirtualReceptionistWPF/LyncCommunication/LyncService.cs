@@ -22,7 +22,11 @@ namespace IGBGVirtualReceptionist.LyncCommunication
         public event EventHandler ClientDisconnected;
         public event EventHandler<SearchContactsEventArgs> SearchContactsFinished;
 
-        // TODO: put this in the constructor
+        public LyncService()
+        {
+            this.Initialize();
+        }
+
         public void Initialize()
         {
             try
@@ -112,28 +116,19 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             }
         }
 
-        public IEnumerable GetContacts()
+        public IEnumerable<ContactInfo> GetFavoriteContacts()
         {
-            //var subscription = this.client.ContactManager.CreateSubscription();
+            var managerContact = this.client.ContactManager.GetContactByUri("sip:zchavdarova@infragistics.com");
+            var managerInfo = ContactInfo.GetContactInfo(managerContact);
+            yield return managerInfo;
 
-            //var contacts = new List<ContactInfo>();
+            var hrContact = this.client.ContactManager.GetContactByUri("sip:ptsvetanova@infragistics.com");
+            var hrInfo = ContactInfo.GetContactInfo(hrContact);
+            yield return hrInfo;
 
-            //foreach (var group in this.client.ContactManager.Groups)
-            //{
-            //    Console.WriteLine("LyncService: Getting contacts from group: " + group.Name);
-            //    foreach (var contact in group)
-            //    {
-            //        subscription.Contacts.Add(contact);
-
-            //        var ci = ContactInfo.GetContactInfo(contact);
-            //        contacts.Add(ci);
-            //    }
-            //}
-
-            //subscription.Subscribe(ContactSubscriptionRefreshRate.Low, new ContactInformationType[] { ContactInformationType.Availability, ContactInformationType.FirstName, ContactInformationType.LastName });
-
-            //return subscription.Contacts;
-            return null;
+            var hrCoordinator = this.client.ContactManager.GetContactByUri("sip:mstefanova@infragistics.com");
+            var hrCoordinatorInfo = ContactInfo.GetContactInfo(hrCoordinator);
+            yield return hrCoordinatorInfo;
         }
 
         public void StartSearchForContactsOrGroups(string searchCriteria)
