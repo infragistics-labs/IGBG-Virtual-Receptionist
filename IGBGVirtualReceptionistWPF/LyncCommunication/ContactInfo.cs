@@ -46,12 +46,14 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             BitmapImage photoImage = null;
             try
             {
-                mStream = (Stream)contact.GetContactInformation(ContactInformationType.Photo);
-                if (mStream != null)
-                {
-                    photoImage = new BitmapImage();
-                    photoImage.StreamSource = mStream;
-                }
+                // TODO: Temp fix for images.
+                photoImage = MainWindow.dummyPic;
+                //mStream = (Stream)contact.GetContactInformation(ContactInformationType.Photo);
+                //if (mStream != null)
+                //{
+                //    photoImage = new BitmapImage();
+                //    photoImage.StreamSource = mStream;
+                //}
             }
             catch (Exception ex)
             {
