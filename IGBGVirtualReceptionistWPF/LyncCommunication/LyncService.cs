@@ -16,6 +16,7 @@ namespace IGBGVirtualReceptionist.LyncCommunication
         private bool thisInitializedLync = false;
         private bool expertSearchEnabled = false;
         private IList<SearchProviders> activeSearchProviders;
+        private ContactSubscription searchResultSubscription;
 
         public event EventHandler<ClientStateChangedEventArgs> ClientStateChanged;
         public event EventHandler ClientDisconnected;
@@ -327,8 +328,7 @@ namespace IGBGVirtualReceptionist.LyncCommunication
                     if (results.AllResults.Count != 0)
                     {
                         // Subscribe to the search results.
-                        // TODO:
-                        //SubscribeToSearchResults(results.Contacts.ToList());
+                        SubscribeToSearchResults(results.Contacts);
 
                         var contactDetails = results.Contacts.Select(x => ContactInfo.GetContactInfo(x));
                         this.RaiseSearchContactsFinished(this, new SearchContactsEventArgs(contactDetails));
@@ -338,6 +338,42 @@ namespace IGBGVirtualReceptionist.LyncCommunication
                 {
                     Console.WriteLine("LyncService Error: " + se.Message);
                 }
+            }
+        }
+
+        public void SubscribeToSearchResults(IEnumerable<Contact> contactsFound)
+        {
+            try
+            {
+                if (this.searchResultSubscription == null)
+                {
+                    // Create subscription for the contact manager
+                    // if the contact manager is not subscribed.
+                    this.searchResultSubscription = this.client.ContactManager.CreateSubscription();
+                }
+                else
+                {
+                    // Remove all existing search results.
+                    this.searchResultSubscription.Unsubscribe();
+                    foreach (Contact c in searchResultSubscription.Contacts)
+                    {
+                        this.searchResultSubscription.RemoveContact(c);
+                    }
+                }
+
+                // Add the Contact to a ContactSubscription.
+                this.searchResultSubscription.AddContacts(contactsFound);
+
+                // Specify the Contact Information Types to be
+                // returned in ContactInformationChanged events.
+                ContactInformationType[] contactInformationTypes = { ContactInformationType.Availability, ContactInformationType.ActivityId };
+
+                // Activate the subscription.
+                this.searchResultSubscription.Subscribe(ContactSubscriptionRefreshRate.High, contactInformationTypes);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("LyncService Error:    " + ex.Message);
             }
         }
     }
