@@ -21,17 +21,17 @@
             <ColumnDefinition Width="350"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-
         <Image Source="/Images/IGLogo.png"/>
         <Label Grid.Column="1" FontSize="45" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Foreground="White">Welcome to Infragistics Sofia</Label>
         <StackPanel  Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
             <igEditors:XamMaskedEditor Name="searchBox" NullText="Search here - Type text and press Search Button..." PromptChar="" Width="300" Theme="IGTheme"/>
             <Button Name="btnSearch" Content="Search" Click="btnSearch_Click" Grid.Column="2" Grid.Row="2"/>
         </StackPanel>
-        <ig:XamTileManager Name="favTiles" Grid.Row="3" Grid.Column="0" BorderBrush="Gray">
+        <ig:XamTileManager Name="favTiles" Grid.Row="3" Grid.Column="0" BorderBrush="Gray" MaximizedTileLimit="0">
             <ig:XamTileManager.ItemTemplate>
                 <DataTemplate>
                     <Border>
+                        <StackPanel>
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
@@ -47,7 +47,8 @@
                             <Label Content="{Binding DisplayName}" Grid.Row="1"/>
                             <Label Content="Availability:" Grid.Row="2" Grid.Column="0"/>
                             <Label Content="{Binding Availability}" Grid.Row="2" Grid.Column="1"/>
-                            <Grid Grid.Row="3">
+                                <StackPanel Grid.Row="3">
+                            <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
                                     <ColumnDefinition/>
@@ -57,7 +58,9 @@
                                 <Button Name="btnCall" Grid.Column="1" Content="Audio" Command="{Binding AudioCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding}"/>
                                 <Button Name="btnVideo"  Grid.Column="2" Content="Video" Command="{Binding VideoCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding}" />
                             </Grid>
-                        </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
                     </Border>
                 </DataTemplate>
             </ig:XamTileManager.ItemTemplate>
@@ -201,21 +204,19 @@
                     </igDP:Field>
                     <igDP:Field Name="FirstName" Label="First Name" Column="1" Row="1" Height="30"/>
                     <igDP:Field Name="LastName" Label="Last Name" Column="1" Row="2" Height="30"/>
-                    <igDP:Field Name="SipUri" Column="1" Row="3" Height="30"/>
-                    <igDP:Field Name="Activity" Column="1" Row="4" Height="30"/>
-                    <igDP:Field Name="Title" Column="1" Row="5" Height="30"/>
-                    <igDP:Field Name="Department" Column="1" Row="6" Height="30"/>
-                    <igDP:Field Name="Description" Column="1" Row="7" Height="30" Visibility="Collapsed"/>
-                    <igDP:Field Name="OutOfficeNote" Column="1" Row="8" Height="30" Visibility="Collapsed"/>
+                    <!--<igDP:Field Name="SipUri" Column="1" Row="3" Height="30"/>-->
+                    <igDP:Field Name="Activity" Label="Status" Column="1" Row="3" Height="30"/>
+                    <igDP:Field Name="Title" Column="1" Row="4" Height="30"/>
+                    <igDP:Field Name="Department" Column="1" Row="5" Height="30"/>
+                    <igDP:Field Name="Description" Column="1" Row="6" Height="30" Visibility="Collapsed"/>
+                    <igDP:Field Name="OutOfficeNote" Column="1" Row="7" Height="30" Visibility="Collapsed"/>
                 </igDP:FieldLayout>
             </igDP:XamDataCards.FieldLayouts>
-
         </igDP:XamDataCards>
 
         <StatusBar Grid.Row="4" Grid.ColumnSpan="2">
             <Label Content="Skype Status"/>
             <StatusBarItem Width="60" HorizontalAlignment="Left" Name="sbiStatus"/>
         </StatusBar>
-
     </Grid>
 </Window>
