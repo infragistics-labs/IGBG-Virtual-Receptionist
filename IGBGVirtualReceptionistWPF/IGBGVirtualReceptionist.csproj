@@ -35,33 +35,33 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="InfragisticsWPF4.Controls.Editors.XamComboEditor.v15.1, Version=15.1.20151.2123, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+    <Reference Include="InfragisticsWPF4.Controls.Editors.XamComboEditor.v15.2">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Work\NetAdvantage\DEV\XAML\2015.1\Source\Build\InfragisticsWPF4.Controls.Editors.XamComboEditor.v15.1.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Work\NetAdvantage\DEV\XAML\2015.2\Source\Build\InfragisticsWPF4.Controls.Editors.XamComboEditor.v15.2.dll</HintPath>
     </Reference>
-    <Reference Include="InfragisticsWPF4.Controls.Interactions.XamDialogWindow.v15.1, Version=15.1.20151.2123, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+    <Reference Include="InfragisticsWPF4.Controls.Interactions.XamDialogWindow.v15.2">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\NetAdvantage\DEV\XAML\2015.1\Source\Build\InfragisticsWPF4.Controls.Interactions.XamDialogWindow.v15.1.dll</HintPath>
+      <HintPath>..\..\NetAdvantage\DEV\XAML\2015.2\Source\Build\InfragisticsWPF4.Controls.Interactions.XamDialogWindow.v15.2.dll</HintPath>
     </Reference>
-    <Reference Include="InfragisticsWPF4.Controls.Layouts.XamTileManager.v15.1, Version=15.1.20151.2123, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+    <Reference Include="InfragisticsWPF4.Controls.Layouts.XamTileManager.v15.2">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\NetAdvantage\DEV\XAML\2015.1\Source\Build\InfragisticsWPF4.Controls.Layouts.XamTileManager.v15.1.dll</HintPath>
+      <HintPath>..\..\NetAdvantage\DEV\XAML\2015.2\Source\Build\InfragisticsWPF4.Controls.Layouts.XamTileManager.v15.2.dll</HintPath>
     </Reference>
-    <Reference Include="InfragisticsWPF4.DataManager.v15.1, Version=15.1.20151.2123, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+    <Reference Include="InfragisticsWPF4.DataManager.v15.2">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Work\NetAdvantage\DEV\XAML\2015.1\Source\Build\InfragisticsWPF4.DataManager.v15.1.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Work\NetAdvantage\DEV\XAML\2015.2\Source\Build\InfragisticsWPF4.DataManager.v15.2.dll</HintPath>
     </Reference>
-    <Reference Include="InfragisticsWPF4.DataPresenter.v15.1, Version=15.1.20151.2123, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+    <Reference Include="InfragisticsWPF4.DataPresenter.v15.2">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Work\NetAdvantage\DEV\XAML\2015.1\Source\Build\InfragisticsWPF4.DataPresenter.v15.1.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Work\NetAdvantage\DEV\XAML\2015.2\Source\Build\InfragisticsWPF4.DataPresenter.v15.2.dll</HintPath>
     </Reference>
-    <Reference Include="InfragisticsWPF4.Editors.v15.1, Version=15.1.20151.2123, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+    <Reference Include="InfragisticsWPF4.Editors.v15.2">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\NetAdvantage\DEV\XAML\2015.1\Source\Build\InfragisticsWPF4.Editors.v15.1.dll</HintPath>
+      <HintPath>..\..\NetAdvantage\DEV\XAML\2015.2\Source\Build\InfragisticsWPF4.Editors.v15.2.dll</HintPath>
     </Reference>
-    <Reference Include="InfragisticsWPF4.v15.1, Version=15.1.20151.2123, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+    <Reference Include="InfragisticsWPF4.v15.2">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Work\NetAdvantage\DEV\XAML\2015.1\Source\Build\InfragisticsWPF4.v15.1.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Work\NetAdvantage\DEV\XAML\2015.2\Source\Build\InfragisticsWPF4.v15.2.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Lync.Model, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -103,6 +103,26 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Themes\IG.MSControls.Core.Implicit.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\IG.xamTileManager.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Styles.Shared.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Styles.WPF.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Theme.Colors.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Person.cs" />
@@ -132,7 +152,9 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\NoPic.png" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\IGLogo.png" />
   </ItemGroup>

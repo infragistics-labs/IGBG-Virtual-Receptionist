@@ -21,17 +21,18 @@
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="350"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
         <Image Source="/Images/IGLogo.png"/>
         <Label Grid.Column="1" FontSize="45" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Foreground="White">Welcome to Infragistics Sofia</Label>
-        <!--<ig:XamComboEditor Name="PersonComboEditor" Grid.Row="2" Grid.Column="1" IsEditable="True"  ItemsSource="{Binding Persons}" DisplayMemberPath="Name" EmptyText="Search here..." SelectionChanged="PersonComboEditor_SelectionChanged" />-->
-        <igEditors:XamMaskedEditor Name="searchBox" Grid.Row="1" Grid.Column="1" NullText="Search here - Type text and press Enter..." PromptChar="" />
-        <Button Name="btnSearch" Content="Search" Click="btnSearch_Click" Grid.Column="2" Grid.Row="2"/>
-        <ig:XamTileManager Name="favTiles" Grid.Row="3" Grid.Column="0">
-            <ig:XamTile Header="Human Resource"  MaximizeButtonVisibility="Collapsed">
+        <StackPanel  Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
+            <igEditors:XamMaskedEditor Name="searchBox" NullText="Search here - Type text and press Search Button..." PromptChar="" Width="300" Theme="IGTheme" />
+            <Button Name="btnSearch" Content="Search" Click="btnSearch_Click" Grid.Column="2" Grid.Row="2"/>
+        </StackPanel>
+        <ig:XamTileManager Name="favTiles" Grid.Row="3" Grid.Column="0" BorderBrush="Gray">
+            <ig:XamTile Header="Human Resource"  MaximizeButtonVisibility="Collapsed" AllowMaximize="False">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition/>
@@ -52,7 +53,7 @@
                     </StatusBar>
                 </Grid>
             </ig:XamTile>
-            <ig:XamTile Header="Office Assistant"  MaximizeButtonVisibility="Collapsed">
+            <ig:XamTile Header="Office Assistant"  MaximizeButtonVisibility="Collapsed" AllowMaximize="False">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition/>
@@ -73,7 +74,7 @@
                     </StatusBar>
                 </Grid>
             </ig:XamTile>
-            <ig:XamTile Header="Office Manager"  MaximizeButtonVisibility="Collapsed">
+            <ig:XamTile Header="Office Manager" MaximizeButtonVisibility="Collapsed" AllowMaximize="False">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition/>
@@ -96,7 +97,7 @@
             </ig:XamTile>
         </ig:XamTileManager>
 
-        <igDP:XamDataCards Name="xamDataCards" Grid.Row="3" Grid.Column="2" Background="Gray">
+        <igDP:XamDataCards Name="xamDataCards" Grid.Row="3" Grid.Column="2" Background="Gray" Theme="IGTheme">
 
             <igDP:XamDataCards.ViewSettings>
                 <igDP:CardViewSettings HeaderPath="DisplayName"
@@ -121,6 +122,105 @@
                         </Setter.Value>
                     </Setter>
                 </Style>
+                <Style TargetType="{x:Type igDP:CardViewCard}">
+                    <Setter Property="Background" Value="{DynamicResource {x:Static igDP:DataPresenterBrushKeys.ViewCardBackgroundBrushKey}}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static igDP:DataPresenterBrushKeys.ViewCardBorderBrushKey}}"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="Visibility" Value="{Binding Path=VisibilityResolved}"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type igDP:CardViewCard}">
+                                <Border x:Name="Bd"
+							BorderThickness="{TemplateBinding BorderThickness}"
+							BorderBrush="{TemplateBinding BorderBrush}"
+							Background="{TemplateBinding Background}"
+							Padding="{TemplateBinding Padding}"
+							CornerRadius="2">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <!-- Element to simulate CardHeaderPresenter when HeaderVisibilty=Hidden -->
+                                        <Border x:Name="HeaderBgWhenVisHidden" Background="{Binding ElementName=CardHeaderPresenter,Path=Background}" Visibility="Collapsed" CornerRadius="2,2,0,0"/>
+
+                                        <!-- Card Header -->
+                                        <igDP:CardHeaderPresenter
+								x:Name="CardHeaderPresenter"
+									Content="{Binding Path=Header, RelativeSource={x:Static RelativeSource.TemplatedParent}}"
+									ContentTemplate="{Binding Path=HeaderTemplate, RelativeSource={x:Static RelativeSource.TemplatedParent}}"
+									ContentTemplateSelector="{Binding Path=HeaderTemplateSelector, RelativeSource={x:Static RelativeSource.TemplatedParent}}"
+									Visibility="{Binding Path=HeaderVisibility, RelativeSource={x:Static RelativeSource.TemplatedParent}}"
+									Card="{Binding RelativeSource={x:Static RelativeSource.TemplatedParent}}"/>
+
+                                        <Rectangle x:Name="captionStroke" Fill="{TemplateBinding BorderBrush}" Height="1" Grid.Row="1"/>
+
+                                        <Rectangle x:Name="outerBd" Fill="{DynamicResource {x:Static igDP:DataPresenterBrushKeys.ViewCardChromeBorderBrushKey}}" Grid.Row="2"/>
+                                        <Border x:Name="innerBd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,0,1,1" Grid.Row="2" Margin="1,0,1,1">
+                                            <!-- Card Content -->
+                                            <ScrollViewer x:Name="CardContentScrollViewer"
+												  Focusable="False"
+												  CanContentScroll="False"
+												  HorizontalScrollBarVisibility="Auto"
+												  VerticalScrollBarVisibility="Auto">
+                                                <Grid x:Name="myGrid">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+
+                                                    <ContentControl x:Name="CardContent" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Grid.Row="0"/>
+                                                    <Grid Grid.Row="1">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Button Name="btnText"  Grid.Column="0" Content="Text"/>
+                                                        <Button Name="btnCall" Grid.Column="1" Content="Audio"/>
+                                                        <Button Name="btnVideo"  Grid.Column="2" Content="Video"/>
+                                                    </Grid>
+                                                </Grid>
+                                            </ScrollViewer>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsCollapsed" Value="True">
+                                        <Setter TargetName="innerBd" Property="Visibility" Value="Collapsed"/>
+                                        <Setter TargetName="Bd" Property="VerticalAlignment" Value="Top"/>
+                                        <Setter TargetName="captionStroke" Property="Visibility" Value="Collapsed"/>
+                                    </Trigger>
+                                    <Trigger Property="HeaderVisibility" Value="Collapsed">
+                                        <Setter TargetName="captionStroke" Property="Visibility" Value="Collapsed"/>
+                                        <Setter TargetName="innerBd" Property="Margin" Value="1"/>
+                                        <Setter TargetName="innerBd" Property="BorderThickness" Value="1"/>
+                                    </Trigger>
+                                    <Trigger Property="HeaderVisibility" Value="Hidden">
+                                        <Setter TargetName="HeaderBgWhenVisHidden" Property="Visibility" Value="Visible"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True"/>
+                                    <Trigger Property="IsActive" Value="True"/>
+                                    <Trigger Property="IsAddRecord" Value="True">
+                                        <Setter TargetName="CardHeaderPresenter" Property="Background" Value="{DynamicResource {x:Static igDP:DataPresenterBrushKeys.ViewCardHeaderAddRowHeaderBrushKey}}"/>
+                                        <Setter TargetName="outerBd" Property="Fill" Value="{DynamicResource {x:Static igDP:DataPresenterBrushKeys.ViewCardHeaderAddRowCardChromeBrushKey}}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsFilterRecord" Value="True">
+                                        <Setter TargetName="CardHeaderPresenter" Property="Background" Value="{DynamicResource {x:Static igDP:DataPresenterBrushKeys.ViewCardHeaderFilterRecordHeaderBrushKey}}"/>
+                                        <Setter TargetName="outerBd" Property="Fill" Value="{DynamicResource {x:Static igDP:DataPresenterBrushKeys.ViewCardHeaderFilterRecordCardChromeBrushKey}}"/>
+                                        <Setter TargetName="CardHeaderPresenter" Property="Foreground" Value="{DynamicResource {x:Static igDP:DataPresenterBrushKeys.ViewCardHeaderAddRowHeaderTextBrushKey}}"/>
+                                    </Trigger>
+
+                                    <!-- JM 03-26-13 TFS134433 -->
+                                    <Trigger Property="IsOpacityReduced" Value="True">
+                                        <Setter TargetName="Bd" Property="Opacity" Value="0.35"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
             </igDP:XamDataCards.Resources>
             <igDP:XamDataCards.FieldLayoutSettings>
                 <igDP:FieldLayoutSettings AutoGenerateFields="False"/>
@@ -132,8 +232,14 @@
                             <igDP:FieldSettings CellMaxWidth="70" CellWidth="70" Width="70" CellValuePresenterStyle="{StaticResource cvpImageStyle}" />
                         </igDP:Field.Settings>
                     </igDP:Field>
-                    <igDP:Field Name="DisplayName" Column="1" Row="1" Height="30"/>
-                    <igDP:Field Name="SipUri" Column="1" Row="2" Height="30"/>
+                    <igDP:Field Name="FirstName" Label="First Name" Column="1" Row="1" Height="30"/>
+                    <igDP:Field Name="LastName" Label="Last Name" Column="1" Row="2" Height="30"/>
+                    <igDP:Field Name="SipUri" Column="1" Row="3" Height="30"/>
+                    <igDP:Field Name="Activity" Column="1" Row="4" Height="30"/>
+                    <igDP:Field Name="Title" Column="1" Row="5" Height="30"/>
+                    <igDP:Field Name="Department" Column="1" Row="6" Height="30"/>
+                    <igDP:Field Name="Description" Column="1" Row="7" Height="30" Visibility="Collapsed"/>
+                    <igDP:Field Name="OutOfficeNote" Column="1" Row="8" Height="30" Visibility="Collapsed"/>
                 </igDP:FieldLayout>
             </igDP:XamDataCards.FieldLayouts>
 
