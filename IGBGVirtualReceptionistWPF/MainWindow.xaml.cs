@@ -27,7 +27,7 @@ namespace IGBGVirtualReceptionist
         {
             InitializeComponent();
             ApplyThemes();
-       //     this.DataContext = this;
+            //     this.DataContext = this;
 
             this.lyncService = new LyncService();
             this.lyncService.ClientStateChanged += this.LyncServiceClientStateChanged;
@@ -62,20 +62,42 @@ namespace IGBGVirtualReceptionist
             dummyPic = new BitmapImage(new Uri(string.Format("pack://application:,,,/{0};component/{1}", assemblyFullName, @"Images\NoPic.bmp")));
         }
 
-
-        
-        
-        public DelegateCommand<ContactInfo> CallCommand
+        public DelegateCommand<ContactInfo> TextCommand
         {
             get
             {
-                return new DelegateCommand<ContactInfo>(CallAction);
+                return new DelegateCommand<ContactInfo>(TextAction);
             }
         }
 
-        public void CallAction(ContactInfo hh)
+        public DelegateCommand<ContactInfo> AudioCommand
         {
+            get
+            {
+                return new DelegateCommand<ContactInfo>(AudioAction);
+            }
+        }
 
+        public DelegateCommand<ContactInfo> VideoCommand
+        {
+            get
+            {
+                return new DelegateCommand<ContactInfo>(VideoAction);
+            }
+        }
+
+        public void TextAction(ContactInfo contactInfo)
+        {
+            lyncService.StartConversation(contactInfo.SipUri);
+        }
+
+        public void AudioAction(ContactInfo contactInfo)
+        {
+            lyncService.StartConversation(contactInfo.SipUri);
+        }
+        public void VideoAction(ContactInfo contactInfo)
+        {
+            lyncService.StartConversation(contactInfo.SipUri);
         }
 
         private void LyncServiceSearchContactsFinished(object sender, SearchContactsEventArgs e)

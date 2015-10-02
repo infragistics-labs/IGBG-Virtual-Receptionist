@@ -53,9 +53,9 @@
                                     <ColumnDefinition/>
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
-                                <Button Name="btnText"  Grid.Column="0" Content="Text"/>
-                                <Button Name="btnCall" Grid.Column="1" Content="Audio"/>
-                                <Button Name="btnVideo"  Grid.Column="2" Content="Video" Command="{Binding CallCommand}" />
+                                <Button Name="btnText"  Grid.Column="0" Content="Text" Command="{Binding TextCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding}"/>
+                                <Button Name="btnCall" Grid.Column="1" Content="Audio" Command="{Binding AudioCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding}"/>
+                                <Button Name="btnVideo"  Grid.Column="2" Content="Video" Command="{Binding VideoCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding}" />
                             </Grid>
                         </Grid>
                     </Border>
@@ -144,9 +144,9 @@
                                                             <ColumnDefinition/>
                                                             <ColumnDefinition/>
                                                         </Grid.ColumnDefinitions>
-                                                        <Button Name="btnText"  Grid.Column="0" Content="Text" Command="{Binding CallCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding DataItem}"/>
-                                                        <Button Name="btnCall" Grid.Column="1" Content="Audio"/>
-                                                        <Button Name="btnVideo"  Grid.Column="2" Content="Video"/>
+                                                        <Button Name="btnText"  Grid.Column="0" Content="Text" Command="{Binding TextCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding DataItem}"/>
+                                                        <Button Name="btnCall" Grid.Column="1" Content="Audio" Command="{Binding AudioCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding DataItem}"/>
+                                                        <Button Name="btnVideo"  Grid.Column="2" Content="Video" Command="{Binding VideoCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding DataItem}"/>
                                                     </Grid>
                                                 </Grid>
                                             </ScrollViewer>
