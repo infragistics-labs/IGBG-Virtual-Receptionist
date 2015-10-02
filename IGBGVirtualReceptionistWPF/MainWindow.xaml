@@ -213,7 +213,7 @@
         </igDP:XamDataCards>
 
         <StatusBar Grid.Row="4" Grid.ColumnSpan="2">
-            <Label Content="Skype Status"/>
+            <Label Content="Status: "/>
             <StatusBarItem Width="60" HorizontalAlignment="Left" Name="sbiStatus"/>
         </StatusBar>
 

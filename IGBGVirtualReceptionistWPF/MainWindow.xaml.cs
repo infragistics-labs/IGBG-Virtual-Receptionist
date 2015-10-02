@@ -27,14 +27,12 @@ namespace IGBGVirtualReceptionist
         {
             InitializeComponent();
             ApplyThemes();
-            //     this.DataContext = this;
 
             this.lyncService = new LyncService();
             this.lyncService.ClientStateChanged += this.LyncServiceClientStateChanged;
             this.lyncService.SearchContactsFinished += this.LyncServiceSearchContactsFinished;
             this.lyncService.ConversationStarted += this.LyncServiceConversationStarted;
             this.lyncService.ConversationEnded += this.LyncServiceConversationEnded;
-            this.favTiles.ItemsSource = lyncService.GetFavoriteContacts();
         }
 
         private void LyncServiceConversationEnded(object sender, ConversationManagerEventArgs e)
@@ -86,18 +84,19 @@ namespace IGBGVirtualReceptionist
             }
         }
 
-        public void TextAction(ContactInfo contactInfo)
+        private void TextAction(ContactInfo contactInfo)
         {
-            lyncService.StartConversation(contactInfo.SipUri);
+            this.lyncService.StartConversation(contactInfo.SipUri);
         }
 
-        public void AudioAction(ContactInfo contactInfo)
+        private void AudioAction(ContactInfo contactInfo)
         {
-            lyncService.StartConversation(contactInfo.SipUri);
+            this.lyncService.StartConversation(contactInfo.SipUri);
         }
-        public void VideoAction(ContactInfo contactInfo)
+
+        private void VideoAction(ContactInfo contactInfo)
         {
-            lyncService.StartConversation(contactInfo.SipUri);
+            this.lyncService.StartConversation(contactInfo.SipUri);
         }
 
         private void LyncServiceSearchContactsFinished(object sender, SearchContactsEventArgs e)
@@ -115,8 +114,12 @@ namespace IGBGVirtualReceptionist
             Dispatcher.BeginInvoke((Action)(() =>
             {
                 sbiStatus.Content = e.NewState.ToString();
-            }));
 
+                if (!this.lyncService.InUISuppressedMode || e.NewState == Microsoft.Lync.Model.ClientState.SignedIn)
+                {
+                    this.favTiles.ItemsSource = this.lyncService.GetFavoriteContacts();
+                }
+            }));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

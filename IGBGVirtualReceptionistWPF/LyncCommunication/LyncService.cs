@@ -19,11 +19,22 @@ namespace IGBGVirtualReceptionist.LyncCommunication
         private IList<SearchProviders> activeSearchProviders;
         private ContactSubscription searchResultSubscription;
 
+        private List<Contact> favoriteContacts;
+        private List<ContactInfo> favoriteContactInfos;
+
         public event EventHandler<ClientStateChangedEventArgs> ClientStateChanged;
         public event EventHandler ClientDisconnected;
         public event EventHandler<SearchContactsEventArgs> SearchContactsFinished;
         public event EventHandler<ConversationManagerEventArgs> ConversationStarted;
         public event EventHandler<ConversationManagerEventArgs> ConversationEnded;
+
+        public bool InUISuppressedMode
+        {
+            get
+            {
+                return this.client.InSuppressedMode;
+            }
+        }
 
         public LyncService()
         {
@@ -118,17 +129,10 @@ namespace IGBGVirtualReceptionist.LyncCommunication
 
         public IEnumerable<ContactInfo> GetFavoriteContacts()
         {
-            var managerContact = this.client.ContactManager.GetContactByUri("sip:zchavdarova@infragistics.com");
-            var managerInfo = ContactInfo.GetContactInfo(managerContact);
-            yield return managerInfo;
+            if (this.favoriteContacts == null || this.favoriteContactInfos == null)
+                this.InitializeFavoriteContacts();
 
-            var hrContact = this.client.ContactManager.GetContactByUri("sip:ptsvetanova@infragistics.com");
-            var hrInfo = ContactInfo.GetContactInfo(hrContact);
-            yield return hrInfo;
-
-            var hrCoordinator = this.client.ContactManager.GetContactByUri("sip:mstefanova@infragistics.com");
-            var hrCoordinatorInfo = ContactInfo.GetContactInfo(hrCoordinator);
-            yield return hrCoordinatorInfo;
+            return this.favoriteContactInfos;
         }
 
         public void StartSearchForContactsOrGroups(string searchCriteria)
@@ -225,6 +229,37 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             return true;
         }
 
+        private void InitializeFavoriteContacts()
+        {
+            if (this.favoriteContacts == null)
+                this.favoriteContacts = new List<Contact>();
+
+            if (this.favoriteContactInfos == null)
+                this.favoriteContactInfos = new List<ContactInfo>();
+
+            if (this.favoriteContactInfos.Count == 0)
+            {
+                var managerContact = this.client.ContactManager.GetContactByUri("sip:zchavdarova@infragistics.com");
+                this.favoriteContacts.Add(managerContact);
+
+                var managerInfo = ContactInfo.GetContactInfo(managerContact);
+                this.favoriteContactInfos.Add(managerInfo);
+
+                var hrContact = this.client.ContactManager.GetContactByUri("sip:ptsvetanova@infragistics.com");
+                this.favoriteContacts.Add(hrContact);
+
+                var hrInfo = ContactInfo.GetContactInfo(hrContact);
+                this.favoriteContactInfos.Add(hrInfo);
+
+                var hrCoordinator = this.client.ContactManager.GetContactByUri("sip:mstefanova@infragistics.com");
+                this.favoriteContacts.Add(hrCoordinator);
+
+                var hrCoordinatorInfo = ContactInfo.GetContactInfo(hrCoordinator);
+                this.favoriteContactInfos.Add(hrCoordinatorInfo);
+            }
+        }
+
+
         private void ClientInitialized(IAsyncResult result)
         {
             if (!result.IsCompleted)
@@ -289,6 +324,11 @@ namespace IGBGVirtualReceptionist.LyncCommunication
 
         private void Client_StateChanged(object sender, ClientStateChangedEventArgs e)
         {
+            if (!this.client.InSuppressedMode || e.NewState == ClientState.SignedIn)
+            {
+                this.InitializeFavoriteContacts();
+            }
+
             var handler = this.ClientStateChanged;
             if (handler != null)
             {
@@ -416,8 +456,8 @@ namespace IGBGVirtualReceptionist.LyncCommunication
                     }
                 }
 
-                // Add the Contact to a ContactSubscription.
                 this.searchResultSubscription.AddContacts(contactsFound);
+                this.searchResultSubscription.AddContacts(this.favoriteContacts);
 
                 // Specify the Contact Information Types to be
                 // returned in ContactInformationChanged events.
