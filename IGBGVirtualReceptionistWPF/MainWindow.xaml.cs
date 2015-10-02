@@ -3,20 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using IGBGVirtualReceptionist.LyncCommunication;
-using System.Timers;
-using Microsoft.Lync.Model;
+using Microsoft.Lync.Model.Conversation;
 
 namespace IGBGVirtualReceptionist
 {
@@ -49,6 +39,20 @@ namespace IGBGVirtualReceptionist
             this.lyncService = new LyncService();
             this.lyncService.ClientStateChanged += this.LyncServiceClientStateChanged;
             this.lyncService.SearchContactsFinished += this.LyncServiceSearchContactsFinished;
+            this.lyncService.ConversationStarted += this.LyncServiceConversationStarted;
+            this.lyncService.ConversationEnded += this.LyncServiceConversationEnded;
+        }
+
+        private void LyncServiceConversationEnded(object sender, ConversationManagerEventArgs e)
+        {
+            MessageBox.Show("Conversation ended!");
+        }
+
+        private void LyncServiceConversationStarted(object sender, ConversationManagerEventArgs e)
+        {
+            MessageBox.Show("Conversation started!");
+
+            e.Conversation.End();
         }
 
         private void LyncServiceSearchContactsFinished(object sender, SearchContactsEventArgs e)

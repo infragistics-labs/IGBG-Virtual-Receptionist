@@ -5,6 +5,7 @@ using Microsoft.Lync.Model;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Lync.Model.Conversation;
 
 namespace IGBGVirtualReceptionist.LyncCommunication
 {
@@ -21,6 +22,8 @@ namespace IGBGVirtualReceptionist.LyncCommunication
         public event EventHandler<ClientStateChangedEventArgs> ClientStateChanged;
         public event EventHandler ClientDisconnected;
         public event EventHandler<SearchContactsEventArgs> SearchContactsFinished;
+        public event EventHandler<ConversationManagerEventArgs> ConversationStarted;
+        public event EventHandler<ConversationManagerEventArgs> ConversationEnded;
 
         public LyncService()
         {
@@ -70,10 +73,8 @@ namespace IGBGVirtualReceptionist.LyncCommunication
 
                     //registers for conversation related events
                     //these events will occur when new conversations are created (incoming/outgoing) and removed
-                   
-                    // TODO:
-                    //client.ConversationManager.ConversationAdded += ConversationManager_ConversationAdded;
-                    //client.ConversationManager.ConversationRemoved += ConversationManager_ConversationRemoved;
+                    client.ConversationManager.ConversationAdded += this.ConversationManagerConversationAdded;
+                    client.ConversationManager.ConversationRemoved += ConversationManagerConversationRemoved;
                 }
 
             }
@@ -98,9 +99,8 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             this.client.ClientDisconnected -= this.Client_ClientDisconnected;
             this.client.ContactManager.SearchProviderStateChanged -= this.ContactManagerSearchProviderStateChanged;
 
-            // TODO: 
-            //this.client.ConversationManager.ConversationAdded -= this.ConversationManager_ConversationAdded;
-            //this.client.ConversationManager.ConversationRemoved -= this.ConversationManager_ConversationRemoved;
+            this.client.ConversationManager.ConversationAdded -= this.ConversationManagerConversationAdded;
+            this.client.ConversationManager.ConversationRemoved -= this.ConversationManagerConversationRemoved;
 
             if (this.client.InSuppressedMode && this.thisInitializedLync)
             {
@@ -163,6 +163,68 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             }
         }
 
+        public bool StartConversation(string contactUri)
+        {
+            var contact = this.searchResultSubscription.Contacts.FirstOrDefault(x => x.Uri == contactUri);
+            if (contact == null)
+            {
+                return false;
+            }
+
+            //creates a new conversation
+            Conversation conversation = null;
+            try
+            {
+                conversation = client.ConversationManager.AddConversation();
+            }
+            catch (LyncClientException e)
+            {
+                Console.WriteLine("LyncSevice Error: " + e.Message);
+            }
+            catch (SystemException systemException)
+            {
+                if (LyncModelExceptionHelper.IsLyncException(systemException))
+                {
+                    // Log the exception thrown by the Lync Model API.
+                    Console.WriteLine("LyncSevice Error: " + systemException);
+                }
+                else
+                {
+                    // Rethrow the SystemException which did not come from the Lync Model API.
+                    throw;
+                }
+            }
+
+            //Adds a participant to the conversation
+            //the window created for this conversation will handle the ParticipantAdded events
+            if (conversation != null)
+            {
+                try
+                {
+                    conversation.AddParticipant(contact);
+                }
+                catch (LyncClientException lyncClientException)
+                {
+                    Console.WriteLine("LyncSevice Error: " + lyncClientException);
+                }
+                catch (SystemException systemException)
+                {
+                    if (LyncModelExceptionHelper.IsLyncException(systemException))
+                    {
+                        // Log the exception thrown by the Lync Model API.
+                        Console.WriteLine("LyncSevice Error: " + systemException);
+                    }
+                    else
+                    {
+                        // Rethrow the SystemException which did not come from the Lync Model API.
+                        throw;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         private void ClientInitialized(IAsyncResult result)
         {
             if (!result.IsCompleted)
@@ -189,12 +251,10 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             // Register for the SearchProviderStatusChanged event raised by ContactManager
             this.client.ContactManager.SearchProviderStateChanged += this.ContactManagerSearchProviderStateChanged;
 
-
             //registers for conversation related events
             //these events will occur when new conversations are created (incoming/outgoing) and removed
-            // TODO:
-            //client.ConversationManager.ConversationAdded += ConversationManager_ConversationAdded;
-            //client.ConversationManager.ConversationRemoved += ConversationManager_ConversationRemoved;
+            client.ConversationManager.ConversationAdded += this.ConversationManagerConversationAdded;
+            client.ConversationManager.ConversationRemoved += this.ConversationManagerConversationRemoved;
         }
 
         private Task SingIn()
@@ -266,7 +326,7 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             if (e.Type == CredentialRequestedType.SignIn)
             {
                 //Re-submit sign in credentials
-                e.Submit("oracle@infragistics.com", "<provide password>", true);
+                e.Submit("<provide user>", "<provide password>", true);
             }
         }
 
@@ -336,7 +396,7 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             }
         }
 
-        public void SubscribeToSearchResults(IEnumerable<Contact> contactsFound)
+        private void SubscribeToSearchResults(IEnumerable<Contact> contactsFound)
         {
             try
             {
@@ -369,6 +429,24 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             catch (Exception ex)
             {
                 MessageBox.Show("LyncService Error:    " + ex.Message);
+            }
+        }
+
+        private void ConversationManagerConversationRemoved(object sender, ConversationManagerEventArgs e)
+        {
+            var handler = this.ConversationEnded;
+            if (handler != null)
+            {
+                handler(sender, e);
+            }
+        }
+
+        private void ConversationManagerConversationAdded(object sender, ConversationManagerEventArgs e)
+        {
+            var handler = this.ConversationStarted;
+            if (handler != null)
+            {
+                handler(sender, e);
             }
         }
     }
