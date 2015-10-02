@@ -49,6 +49,7 @@ namespace IGBGVirtualReceptionist
             Dispatcher.BeginInvoke((Action)(() =>
             {
                 var window = new ConversationWindow(e.Conversation, this.lyncService.Client, e.ContactInfo);
+                window.InitiateAudioCall();
                 window.ShowDialog();
             }));
 

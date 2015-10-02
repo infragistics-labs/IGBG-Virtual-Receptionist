@@ -42,7 +42,29 @@ namespace IGBGVirtualReceptionist
 
         public void InitiateAudioCall()
         {
-            
+            //starts an audio call or conference by connecting the AvModality
+            try
+            {
+                AsyncCallback callback = new AsyncOperationHandler(avModality.EndConnect).Callback;
+                avModality.BeginConnect(callback, null);
+            }
+            catch (LyncClientException lyncClientException)
+            {
+                Console.WriteLine("ConversationWindow Error:" + lyncClientException);
+            }
+            catch (SystemException systemException)
+            {
+                if (LyncModelExceptionHelper.IsLyncException(systemException))
+                {
+                    // Log the exception thrown by the Lync Model API.
+                    Console.WriteLine("ConversationWindow Error: " + systemException);
+                }
+                else
+                {
+                    // Rethrow the SystemException which did not come from the Lync Model API.
+                    throw;
+                }
+            }
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
