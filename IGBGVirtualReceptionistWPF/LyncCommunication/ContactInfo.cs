@@ -14,7 +14,7 @@ namespace IGBGVirtualReceptionist.LyncCommunication
 
         public BitmapImage PhotoImage { get; private set; }
 
-        public string Availability { get; private set; }
+        public ContactAvailability Availability { get; private set; }
 
         public string Activity { get; private set; }
 
@@ -61,16 +61,30 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             return new ContactInfo(displayName, contact.Uri)
             {
                 PhotoImage = photoImage,
-                Availability = (string)contact.GetContactInformation(ContactInformationType.Availability),
-                Activity = (string)contact.GetContactInformation(ContactInformationType.Activity),
-                Title = (string)contact.GetContactInformation(ContactInformationType.Title),
-                Department = (string)contact.GetContactInformation(ContactInformationType.Department),
-                OutOfficeNote  = (string)contact.GetContactInformation(ContactInformationType.OutOfficeNote),
-                Description  = (string)contact.GetContactInformation(ContactInformationType.Description),
-                FirstName = (string)contact.GetContactInformation(ContactInformationType.FirstName),
-                LastName = (string)contact.GetContactInformation(ContactInformationType.LastName),
-                Capabilities = (ContactCapabilities)contact.GetContactInformation(ContactInformationType.Capabilities)
+                Availability = GetContactInfo<ContactAvailability>(contact, ContactInformationType.Availability),
+                Activity = GetContactInfo<string>(contact, ContactInformationType.Activity),
+                Title = GetContactInfo<string>(contact, ContactInformationType.Title),
+                Department = GetContactInfo<string>(contact, ContactInformationType.Department),
+                OutOfficeNote = GetContactInfo<string>(contact, ContactInformationType.OutOfficeNote),
+                Description = GetContactInfo<string>(contact, ContactInformationType.Description),
+                FirstName = GetContactInfo<string>(contact, ContactInformationType.FirstName),
+                LastName = GetContactInfo<string>(contact, ContactInformationType.LastName),
+                Capabilities = GetContactInfo<ContactCapabilities>(contact, ContactInformationType.Capabilities)
             };
+        }
+
+        private static T GetContactInfo<T>(Contact contact, ContactInformationType infoType)
+        {
+            try
+            {
+                return (T)contact.GetContactInformation(infoType);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ContactInfo: Could not get contact info - " + ex.Message);
+            }
+
+            return default(T);
         }
     }
 }
