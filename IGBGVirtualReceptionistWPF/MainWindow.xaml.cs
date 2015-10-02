@@ -1,12 +1,10 @@
-﻿using IGBGVirtualReceptionist.LyncCommunication;
-using Microsoft.Practices.Prism.Commands;
+﻿using Microsoft.Practices.Prism.Commands;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using System.Windows.Data;
 using IGBGVirtualReceptionist.LyncCommunication;
 using Microsoft.Lync.Model.Conversation;
 
@@ -35,16 +33,26 @@ namespace IGBGVirtualReceptionist
             this.lyncService.ConversationEnded += this.LyncServiceConversationEnded;
         }
 
-        private void LyncServiceConversationEnded(object sender, ConversationManagerEventArgs e)
+        private void LyncServiceConversationEnded(object sender, ConversationEventArgs e)
         {
             MessageBox.Show("Conversation ended!");
         }
 
-        private void LyncServiceConversationStarted(object sender, ConversationManagerEventArgs e)
+        private void LyncServiceConversationStarted(object sender, ConversationEventArgs e)
         {
-            MessageBox.Show("Conversation started!");
+            if (e.ContactInfo == null)
+            {
+                e.Conversation.End();
+                return;
+            }
 
-            e.Conversation.End();
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
+                var window = new ConversationWindow(e.Conversation, this.lyncService.Client, e.ContactInfo);
+                window.InitiateAudioCall();
+                window.ShowDialog();
+            }));
+
         }
 
         private void ApplyThemes()
