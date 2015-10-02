@@ -5,74 +5,144 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:IGBGVirtualReceptionist"
         xmlns:ig="http://schemas.infragistics.com/xaml"
+        xmlns:igDP="http://infragistics.com/DataPresenter"
+        xmlns:igEditors="http://infragistics.com/Editors"
         mc:Ignorable="d"
         Title="IG BG Virtual Receptionist" WindowState="Maximized">
-    <Grid Name="rootGrid">
+    <Window.Resources>
+        <local:MyConv x:Key="myConv"/>
+    </Window.Resources>
+    <Grid Name="rootGrid" Background="Gray">
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
             <RowDefinition Height="40"/>
             <RowDefinition Height="30"/>
             <RowDefinition/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
+
         <Image Source="/Images/IGLogo.png"/>
-        <Label Grid.Column="1" FontSize="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">IG BG Virtual Receptionist</Label>
-        <ig:XamComboEditor Name="PersonComboEditor" Grid.Row="2" Grid.Column="0" IsEditable="True" ItemsSource="{Binding Persons}" DisplayMemberPath="Name" EmptyText="Search here..." SelectionChanged="PersonComboEditor_SelectionChanged" />
+        <Label Grid.Column="1" FontSize="45" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Foreground="White">Welcome to Infragistics Sofia</Label>
+        <!--<ig:XamComboEditor Name="PersonComboEditor" Grid.Row="2" Grid.Column="1" IsEditable="True"  ItemsSource="{Binding Persons}" DisplayMemberPath="Name" EmptyText="Search here..." SelectionChanged="PersonComboEditor_SelectionChanged" />-->
+        <igEditors:XamMaskedEditor Name="searchBox" Grid.Row="1" Grid.Column="1" NullText="Search here - Type text and press Enter..." PromptChar="" />
+        <Button Name="btnSearch" Content="Search" Click="btnSearch_Click" Grid.Column="2" Grid.Row="2"/>
+        <ig:XamTileManager Name="favTiles" Grid.Row="3" Grid.Column="0">
+            <ig:XamTile Header="Human Resource"  MaximizeButtonVisibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Image Source="/Images/IGLogo.png" Height="40" Width="40" Grid.Row="0"/>
+                    <TextBlock Text="Plamena" Grid.Row="1"/>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal">
+                        <Button Content="Text message" />
+                        <Button Content="Audio call"/>
+                        <Button Content="Video call"/>
+                    </StackPanel>
+                    <StatusBar Grid.Row="3">
+                        <Label Content="Status: "/>
+                        <StatusBarItem Background="Green" Width="40" HorizontalAlignment="Left" Name="HRStatus"/>
+                    </StatusBar>
+                </Grid>
+            </ig:XamTile>
+            <ig:XamTile Header="Office Assistant"  MaximizeButtonVisibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Image Source="/Images/IGLogo.png" Height="40" Width="40" Grid.Row="0"/>
+                    <TextBlock Text="Monika" Grid.Row="1"/>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal">
+                        <Button Content="Text message"/>
+                        <Button Content="Audio call"/>
+                        <Button Content="Video call"/>
+                    </StackPanel>
+                    <StatusBar Grid.Row="3">
+                        <Label Content="Status: "/>
+                        <StatusBarItem Background="Green" Width="40" HorizontalAlignment="Left" Name="OAStatus"/>
+                    </StatusBar>
+                </Grid>
+            </ig:XamTile>
+            <ig:XamTile Header="Office Manager"  MaximizeButtonVisibility="Collapsed">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Image Source="/Images/IGLogo.png" Height="40" Width="40" Grid.Row="0"/>
+                    <TextBlock Text="Zori" Grid.Row="1"/>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal">
+                        <Button Content="Text message"/>
+                        <Button Content="Audio call"/>
+                        <Button Content="Video call"/>
+                    </StackPanel>
+                    <StatusBar Grid.Row="3">
+                        <Label Content="Status: "/>
+                        <StatusBarItem Background="Green" Width="40" HorizontalAlignment="Left" Name="OMStatus"/>
+                    </StatusBar>
+                </Grid>
+            </ig:XamTile>
+        </ig:XamTileManager>
 
-        <Grid x:Name="gridPersonDetailsPanel" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" Margin="0, 30, 0, 0" Visibility="Collapsed">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
+        <igDP:XamDataCards Name="xamDataCards" Grid.Row="3" Grid.Column="2" Background="Gray">
 
-            <Image x:Name="personPhoto" Height="100" Source="Images/IgLogo.png" Grid.Row="0" Grid.RowSpan="2"/>
+            <igDP:XamDataCards.ViewSettings>
+                <igDP:CardViewSettings HeaderPath="DisplayName"
+                                       HeaderVisibility="Visible" />
+            </igDP:XamDataCards.ViewSettings>
+            <igDP:XamDataCards.Resources>
+                <Style TargetType="{x:Type igDP:CellValuePresenter}">
+                    <Style.Setters>
+                        <Setter Property="Padding" Value="0,-4,0,-4"/>
+                    </Style.Setters>
+                </Style>
+                <Style TargetType="{x:Type igDP:CellValuePresenter}" x:Key="cvpImageStyle">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type igDP:CellValuePresenter}">
+                                <Grid Width="70" Height="70" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="5,5,2,0">
+                                    <Image  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Width="10" Height="10"
+                                            VerticalAlignment="Top" 
+                                            Source="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Record.DataItem.PhotoImage}"/>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </igDP:XamDataCards.Resources>
+            <igDP:XamDataCards.FieldLayoutSettings>
+                <igDP:FieldLayoutSettings AutoGenerateFields="False"/>
+            </igDP:XamDataCards.FieldLayoutSettings>
+            <igDP:XamDataCards.FieldLayouts>
+                <igDP:FieldLayout>
+                    <igDP:Field Name="PhotoImage" RowSpan="6" Column="0">
+                        <igDP:Field.Settings>
+                            <igDP:FieldSettings CellMaxWidth="70" CellWidth="70" Width="70" CellValuePresenterStyle="{StaticResource cvpImageStyle}" />
+                        </igDP:Field.Settings>
+                    </igDP:Field>
+                    <igDP:Field Name="DisplayName" Column="1" Row="1" Height="30"/>
+                    <igDP:Field Name="SipUri" Column="1" Row="2" Height="30"/>
+                </igDP:FieldLayout>
+            </igDP:XamDataCards.FieldLayouts>
 
-            <Label x:Name="lblStatus" Content="Status" Grid.Row="2" Grid.Column="0" />
-            <TextBlock x:Name="personStatus" Grid.Row="3" Grid.Column="0"/>
-            <Label x:Name="lblLocation" Content="Location" Grid.Row="4" Grid.Column="0"/>
-            <TextBlock x:Name="personLocation" Grid.Row="5" Grid.Column="0"/>
-            <Label x:Name="lblFirstName" Content="First Name" Grid.Row="0" Grid.Column="1" />
-            <TextBlock x:Name="personFirstName" Grid.Row="1" Grid.Column="1" Text="{Binding ElementName=PersonComboEditor, Path=SelectedItem.Name}"/>
-            <Label x:Name="lblLastName" Content="Last Name" Grid.Row="2" Grid.Column="1"/>
-            <TextBlock x:Name="personLastName" Grid.Row="3" Grid.Column="1"/>
-            <Label x:Name="lblTitle" Content="Title" Grid.Row="4" Grid.Column="1" />
-            <TextBlock x:Name="personTitle" Grid.Row="5" Grid.Column="1"/>
-            <Label x:Name="lblTeam" Content="Team" Grid.Row="6" Grid.Column="1"/>
-            <TextBlock x:Name="personTeam" Grid.Row="3" Grid.Column="1"/>
+        </igDP:XamDataCards>
 
-            <!--Buttons-->
-            <Button Grid.Row="8" Grid.Column="0" x:Name="btnAudioCallPerson" Content="Audio Call" HorizontalAlignment="Left"/>
-            <Button Grid.Row="8" Grid.Column="1" x:Name="btnVideoCallPerson" Content="Video Call" HorizontalAlignment="Left"/>
-        </Grid>
-
-        <Grid Name="Favorities" Grid.Row="3" Grid.Column="2">
-            
-            <!--<StackPanel >
-                <Label Content="Favorites"/>
-                <Separator/>
-                <Button Content="Human Resources" />
-                <Separator/>
-                <Button Content="Office Assitant" />
-                <Separator/>
-                <Button Content="Office Manager"/>
-            </StackPanel>-->
-        </Grid>
-
+        <StatusBar Grid.Row="4" Grid.ColumnSpan="2">
+            <Label Content="Skype Status"/>
+            <StatusBarItem Width="60" HorizontalAlignment="Left" Name="sbiStatus"/>
+        </StatusBar>
 
     </Grid>
 </Window>
