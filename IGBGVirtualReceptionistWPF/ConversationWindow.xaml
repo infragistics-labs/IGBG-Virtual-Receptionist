@@ -4,7 +4,6 @@
         xmlns:ig="http://schemas.infragistics.com/xaml"
         xmlns:igDP="http://infragistics.com/DataPresenter"
         xmlns:igEditors="http://infragistics.com/Editors"
-        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         Height="450" Width="450" Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
@@ -26,12 +25,8 @@
         
         <Border x:Name="contentArea" Margin="5" Grid.ColumnSpan="2" Grid.Row="1">
             <StackPanel Orientation="Horizontal">
-                <WindowsFormsHost Margin="2">
-                    <wf:Panel x:Name="outVideo" AutoSize="True"/>
-                </WindowsFormsHost>
-                <WindowsFormsHost Margin="2">
-                    <wf:Panel x:Name="inVideo" AutoSize="True"/>
-                </WindowsFormsHost>
+                <Canvas x:Name="inVideo" />
+                <Canvas x:Name="outVideo" />
             </StackPanel>
         </Border>
         

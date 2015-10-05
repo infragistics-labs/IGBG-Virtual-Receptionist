@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows;
 using IGBGVirtualReceptionist.LyncCommunication;
 using Microsoft.Lync.Model;
@@ -286,19 +285,23 @@ namespace IGBGVirtualReceptionist
             //
             //*****************************************************************************************
 
-            //if the outgoing video is now active, show the video (which is only available in UI Suppression Mode)
-            if ((e.NewState == ChannelState.Send || e.NewState == ChannelState.SendReceive) &&
-                videoChannel.CaptureVideoWindow != null)
-            {
-                //presents the video in the panel
-                ShowVideo(this.outVideo, videoChannel.CaptureVideoWindow);
-            }
+            // TODO: this one is working only if the app is located somewhere in user's directory due to some Windows user permissions.
+
+            ////if the outgoing video is now active, show the video (which is only available in UI Suppression Mode)
+            //if ((e.NewState == ChannelState.Send || e.NewState == ChannelState.SendReceive) &&
+            //    videoChannel.CaptureVideoWindow != null)
+            //{
+            //    //presents the video in the panel
+            //    //ShowVideo(this.outVideo, videoChannel.CaptureVideoWindow);
+            //    ShowVideo(this.outVideo, videoChannel.CaptureVideoWindow);
+            //}
 
             //if the incoming video is now active, show the video (which is only available in UI Suppression Mode)
             if ((e.NewState == ChannelState.Receive || e.NewState == ChannelState.SendReceive) &&
                 videoChannel.RenderVideoWindow != null)
             {
                 //presents the video in the panel
+                //ShowVideo(this.inVideo, videoChannel.RenderVideoWindow);
                 ShowVideo(this.inVideo, videoChannel.RenderVideoWindow);
             }
         }
@@ -306,41 +309,14 @@ namespace IGBGVirtualReceptionist
         /// <summary>
         /// Shows the specified video window in the specified panel.
         /// </summary>
-        private void ShowVideo(System.Windows.Forms.Panel videoPanel, VideoWindow videoWindow)
+        private void ShowVideo(Panel videoPanel, VideoWindow videoWindow)
         {
-            //Win32 constants:                  WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-            const long lEnableWindowStyles = 0x40000000L | 0x02000000L | 0x04000000L;
-            //Win32 constants:                   WS_POPUP| WS_CAPTION | WS_SIZEBOX
-            const long lDisableWindowStyles = 0x80000000 | 0x00C00000 | 0x00040000L;
-            const int OATRUE = -1;
-
             Dispatcher.BeginInvoke((Action)(() =>
             {
                 try
                 {
-                    // TODO: setting videoWindow.Owner throws an exception. Fix it
-
-                    ////sets the properties required for the native video window to draw itself
-                    //videoWindow.Owner = videoPanel.Handle.ToInt32();
-                    //videoWindow.SetWindowPosition(0, 0, videoPanel.Width, videoPanel.Height);
-
-                    ////gets the current window style to modify it
-                    //long currentStyle = videoWindow.WindowStyle;
-
-                    ////disables borders, sizebox, close button
-                    //currentStyle = currentStyle & ~lDisableWindowStyles;
-
-                    ////enables styles for a child window
-                    //currentStyle = currentStyle | lEnableWindowStyles;
-
-                    ////updates the current window style
-                    //videoWindow.WindowStyle = (int)currentStyle;
-
-                    //updates the visibility
-                    videoWindow.Visible = OATRUE;
-
-                    videoWindow.Width = 300;
-                    videoWindow.Height = 300;
+                    var window = new VideoWindowHost(videoWindow, 300, 300);
+                    videoPanel.Children.Add(window);
                 }
                 catch (Exception exception)
                 {
@@ -348,5 +324,48 @@ namespace IGBGVirtualReceptionist
                 }
             }));
         }
+
+        //private void ShowVideo(System.Windows.Forms.Panel videoPanel, VideoWindow videoWindow)
+        //{
+        //    //Win32 constants:                  WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+        //    const long lEnableWindowStyles = 0x40000000L | 0x02000000L | 0x04000000L;
+        //    //Win32 constants:                   WS_POPUP| WS_CAPTION | WS_SIZEBOX
+        //    const long lDisableWindowStyles = 0x80000000 | 0x00C00000 | 0x00040000L;
+        //    const int OATRUE = -1;
+
+        //    Dispatcher.BeginInvoke((Action)(() =>
+        //    {
+        //        try
+        //        {
+        //            // TODO: setting videoWindow.Owner throws an exception. Fix it
+
+        //            ////sets the properties required for the native video window to draw itself
+        //            //videoWindow.Owner = videoPanel.Handle.ToInt32();
+        //            //videoWindow.SetWindowPosition(0, 0, videoPanel.Width, videoPanel.Height);
+
+        //            ////gets the current window style to modify it
+        //            //long currentStyle = videoWindow.WindowStyle;
+
+        //            ////disables borders, sizebox, close button
+        //            //currentStyle = currentStyle & ~lDisableWindowStyles;
+
+        //            ////enables styles for a child window
+        //            //currentStyle = currentStyle | lEnableWindowStyles;
+
+        //            ////updates the current window style
+        //            //videoWindow.WindowStyle = (int)currentStyle;
+
+        //            //updates the visibility
+        //            videoWindow.Visible = OATRUE;
+
+        //            videoWindow.Width = 300;
+        //            videoWindow.Height = 300;
+        //        }
+        //        catch (Exception exception)
+        //        {
+        //            Console.WriteLine("ConversationWindow Error:" + exception);
+        //        }
+        //    }));
+        //}
     }
 }
