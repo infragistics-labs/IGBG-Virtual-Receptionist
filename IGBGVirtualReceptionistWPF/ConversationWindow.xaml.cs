@@ -20,6 +20,7 @@ namespace IGBGVirtualReceptionist
         //self participant's AvModality
         private AVModality avModality;
 
+        // TODO: conversation code should be moved to LyncService
         //self participant's channels
         private AudioChannel audioChannel;
         private VideoChannel videoChannel;
