@@ -5,6 +5,7 @@ using IGBGVirtualReceptionist.LyncCommunication;
 using Microsoft.Lync.Model;
 using Microsoft.Lync.Model.Conversation;
 using Microsoft.Lync.Model.Conversation.AudioVideo;
+using System.Windows.Controls;
 
 namespace IGBGVirtualReceptionist
 {
@@ -136,6 +137,33 @@ namespace IGBGVirtualReceptionist
             }
         }
 
+        private void InitiateVideoCall()
+        {
+            //starts a video call or the video stream in a audio call
+            try
+            {
+                AsyncCallback callback = new AsyncOperationHandler(videoChannel.EndStart).Callback;
+                videoChannel.BeginStart(callback, null);
+            }
+            catch (LyncClientException lyncClientException)
+            {
+                Console.WriteLine("ConversationWindow Error:" + lyncClientException);
+            }
+            catch (SystemException systemException)
+            {
+                if (LyncModelExceptionHelper.IsLyncException(systemException))
+                {
+                    // Log the exception thrown by the Lync Model API.
+                    Console.WriteLine("ConversationWindow Error:" + systemException);
+                }
+                else
+                {
+                    // Rethrow the SystemException which did not come from the Lync Model API.
+                    throw;
+                }
+            }
+        }
+
         private void ApplyThemes()
         {
             var assemblyFullName = this.GetType().Assembly.FullName;
@@ -157,6 +185,7 @@ namespace IGBGVirtualReceptionist
                 case ConversationType.Text:
                     break;
                 case ConversationType.Video:
+                    this.InitiateVideoCall();
                     break;
             }
         }
@@ -234,76 +263,78 @@ namespace IGBGVirtualReceptionist
         {
             this.SetVideoStatus(e.NewState.ToString());
 
+            //*****************************************************************************************
+            //                              Video Content
+            //
+            // The video content is only available when the Lync client is running in UISuppressionMode.
+            //
+            // The video content is not directly accessible as a stream. It's rather available through
+            // a video window that can de drawn in any panel or window.
+            //
+            // The outgoing video is accessible from videoChannel.CaptureVideoWindow
+            // The window will be available when the video channel state is either Send or SendReceive.
+            // 
+            // The incoming video is accessible from videoChannel.RenderVideoWindow
+            // The window will be available when the video channel state is either Receive or SendReceive.
+            //
+            //*****************************************************************************************
 
-            ////*****************************************************************************************
-            ////                              Video Content
-            ////
-            //// The video content is only available when the Lync client is running in UISuppressionMode.
-            ////
-            //// The video content is not directly accessible as a stream. It's rather available through
-            //// a video window that can de drawn in any panel or window.
-            ////
-            //// The outgoing video is accessible from videoChannel.CaptureVideoWindow
-            //// The window will be available when the video channel state is either Send or SendReceive.
-            //// 
-            //// The incoming video is accessible from videoChannel.RenderVideoWindow
-            //// The window will be available when the video channel state is either Receive or SendReceive.
-            ////
-            ////*****************************************************************************************
+            //if the outgoing video is now active, show the video (which is only available in UI Suppression Mode)
+            if ((e.NewState == ChannelState.Send || e.NewState == ChannelState.SendReceive) &&
+                videoChannel.CaptureVideoWindow != null)
+            {
+                //presents the video in the panel
+                ShowVideo(this.outVideo, videoChannel.CaptureVideoWindow);
+            }
 
-            ////if the outgoing video is now active, show the video (which is only available in UI Suppression Mode)
-            //if ((e.NewState == ChannelState.Send
-            //    || e.NewState == ChannelState.SendReceive) && videoChannel.CaptureVideoWindow != null)
-            //{
-            //    //presents the video in the panel
-            //    ShowVideo(panelOutgoingVideo, videoChannel.CaptureVideoWindow);
-            //}
-
-            ////if the incoming video is now active, show the video (which is only available in UI Suppression Mode)
-            //if ((e.NewState == ChannelState.Receive
-            //    || e.NewState == ChannelState.SendReceive) && videoChannel.RenderVideoWindow != null)
-            //{
-            //    //presents the video in the panel
-            //    ShowVideo(panelIncomingVideo, videoChannel.RenderVideoWindow);
-            //}
+            //if the incoming video is now active, show the video (which is only available in UI Suppression Mode)
+            if ((e.NewState == ChannelState.Receive || e.NewState == ChannelState.SendReceive) &&
+                videoChannel.RenderVideoWindow != null)
+            {
+                //presents the video in the panel
+                ShowVideo(this.inVideo, videoChannel.RenderVideoWindow);
+            }
         }
 
-        ///// <summary>
-        ///// Shows the specified video window in the specified panel.
-        ///// </summary>
-        //private static void ShowVideo(Panel videoPanel, VideoWindow videoWindow)
-        //{
-        //    //Win32 constants:                  WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-        //    const long lEnableWindowStyles = 0x40000000L | 0x02000000L | 0x04000000L;
-        //    //Win32 constants:                   WS_POPUP| WS_CAPTION | WS_SIZEBOX
-        //    const long lDisableWindowStyles = 0x80000000 | 0x00C00000 | 0x00040000L;
-        //    const int OATRUE = -1;
+        /// <summary>
+        /// Shows the specified video window in the specified panel.
+        /// </summary>
+        private void ShowVideo(System.Windows.Forms.Panel videoPanel, VideoWindow videoWindow)
+        {
+            //Win32 constants:                  WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+            const long lEnableWindowStyles = 0x40000000L | 0x02000000L | 0x04000000L;
+            //Win32 constants:                   WS_POPUP| WS_CAPTION | WS_SIZEBOX
+            const long lDisableWindowStyles = 0x80000000 | 0x00C00000 | 0x00040000L;
+            const int OATRUE = -1;
 
-        //    try
-        //    {
-        //        //sets the properties required for the native video window to draw itself
-        //        videoWindow.Owner = videoPanel.Handle.ToInt32();
-        //        videoWindow.SetWindowPosition(0, 0, videoPanel.Width, videoPanel.Height);
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
+                try
+                {
+                    //sets the properties required for the native video window to draw itself
+                    videoWindow.Owner = videoPanel.Handle.ToInt32();
+                    videoWindow.SetWindowPosition(0, 0, videoPanel.Width, videoPanel.Height);
 
-        //        //gets the current window style to modify it
-        //        long currentStyle = videoWindow.WindowStyle;
+                    //gets the current window style to modify it
+                    long currentStyle = videoWindow.WindowStyle;
 
-        //        //disables borders, sizebox, close button
-        //        currentStyle = currentStyle & ~lDisableWindowStyles;
+                    //disables borders, sizebox, close button
+                    currentStyle = currentStyle & ~lDisableWindowStyles;
 
-        //        //enables styles for a child window
-        //        currentStyle = currentStyle | lEnableWindowStyles;
+                    //enables styles for a child window
+                    currentStyle = currentStyle | lEnableWindowStyles;
 
-        //        //updates the current window style
-        //        videoWindow.WindowStyle = (int)currentStyle;
+                    //updates the current window style
+                    videoWindow.WindowStyle = (int)currentStyle;
 
-        //        //updates the visibility
-        //        videoWindow.Visible = OATRUE;
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        Console.WriteLine(exception);
-        //    }
-        //}
+                    //updates the visibility
+                    videoWindow.Visible = OATRUE;
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine("ConversationWindow Error:" + exception);
+                }
+            }));
+        }
     }
 }

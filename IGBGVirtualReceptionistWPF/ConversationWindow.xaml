@@ -4,7 +4,8 @@
         xmlns:ig="http://schemas.infragistics.com/xaml"
         xmlns:igDP="http://infragistics.com/DataPresenter"
         xmlns:igEditors="http://infragistics.com/Editors"
-        Height="300" Width="300" Loaded="Window_Loaded">
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        Height="450" Width="450" Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -25,7 +26,12 @@
         
         <Border x:Name="contentArea" Margin="5" Grid.ColumnSpan="2" Grid.Row="1">
             <StackPanel Orientation="Horizontal">
-                <!--TODO: put content here (audio, text, video feeds) -->
+                <WindowsFormsHost Margin="2">
+                    <wf:Panel x:Name="outVideo" AutoSize="True"/>
+                </WindowsFormsHost>
+                <WindowsFormsHost Margin="2">
+                    <wf:Panel x:Name="inVideo" AutoSize="True"/>
+                </WindowsFormsHost>
             </StackPanel>
         </Border>
         
