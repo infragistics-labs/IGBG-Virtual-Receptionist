@@ -34,6 +34,13 @@
         </Grid>
 
         <StatusBar x:Name="statusbar" Grid.Row="3">
+            <TextBlock x:Name="conversationStatus" />
+            <Separator />
+            <TextBlock x:Name="modalityStatus" />
+            <Separator />
+            <TextBlock x:Name="audioStatus" />
+            <Separator />
+            <TextBlock x:Name="videoStatus" />
         </StatusBar>
     </Grid>
 </Window>
