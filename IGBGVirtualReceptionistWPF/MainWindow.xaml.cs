@@ -18,6 +18,7 @@ namespace IGBGVirtualReceptionist
     {
         private LyncService lyncService;
         public static BitmapImage dummyPic = new BitmapImage();
+        private ConversationWindow currentConversationWindow;
 
         private List<ContactInfo> currentSearchResults = new List<ContactInfo>();
 
@@ -31,28 +32,6 @@ namespace IGBGVirtualReceptionist
             this.lyncService.SearchContactsFinished += this.LyncServiceSearchContactsFinished;
             this.lyncService.ConversationStarted += this.LyncServiceConversationStarted;
             this.lyncService.ConversationEnded += this.LyncServiceConversationEnded;
-        }
-
-        private void LyncServiceConversationEnded(object sender, ConversationEventArgs e)
-        {
-            MessageBox.Show("Conversation ended!");
-        }
-
-        private void LyncServiceConversationStarted(object sender, ConversationEventArgs e)
-        {
-            if (e.ContactInfo == null)
-            {
-                e.Conversation.End();
-                return;
-            }
-
-            Dispatcher.BeginInvoke((Action)(() =>
-            {
-                var window = new ConversationWindow(e.Conversation, this.lyncService.Client, e.ContactInfo);
-                window.InitiateAudioCall();
-                window.ShowDialog();
-            }));
-
         }
 
         private void ApplyThemes()
@@ -94,17 +73,57 @@ namespace IGBGVirtualReceptionist
 
         private void TextAction(ContactInfo contactInfo)
         {
-            this.lyncService.StartConversation(contactInfo.SipUri);
+            this.lyncService.StartConversation(contactInfo.SipUri, ConversationType.Text);
         }
 
         private void AudioAction(ContactInfo contactInfo)
         {
-            this.lyncService.StartConversation(contactInfo.SipUri);
+            this.lyncService.StartConversation(contactInfo.SipUri, ConversationType.Audio);
         }
 
         private void VideoAction(ContactInfo contactInfo)
         {
-            this.lyncService.StartConversation(contactInfo.SipUri);
+            this.lyncService.StartConversation(contactInfo.SipUri, ConversationType.Video);
+        }
+
+        private void LyncServiceConversationEnded(object sender, ConversationEventArgs e)
+        {
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
+                if (this.currentConversationWindow != null && this.currentConversationWindow.IsLoaded)
+                {
+                    this.currentConversationWindow.Close();
+                    MessageBox.Show("The other participant declined the conversation!");
+                }
+                else
+                {
+                    MessageBox.Show("Conversation ended!");
+                }
+
+                this.currentConversationWindow = null;
+            }));
+        }
+
+        private void LyncServiceConversationStarted(object sender, ConversationEventArgs e)
+        {
+            if (e.ContactInfo == null)
+            {
+                e.Conversation.End();
+                return;
+            }
+
+            this.ShowConversationDialog(e.Conversation, e.ContactInfo, e.ConversationType);
+        }
+
+        private void ShowConversationDialog(Conversation conversation, ContactInfo contactInfo, ConversationType conversationType)
+        {
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
+                var window = new ConversationWindow(conversation, this.lyncService.Client, contactInfo, conversationType);
+                this.currentConversationWindow = window;
+                window.ShowDialog();
+            }));
+
         }
 
         private void LyncServiceSearchContactsFinished(object sender, SearchContactsEventArgs e)

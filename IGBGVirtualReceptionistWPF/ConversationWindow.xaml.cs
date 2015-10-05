@@ -15,6 +15,7 @@ namespace IGBGVirtualReceptionist
     {
         private LyncClient client;
         private Conversation conversation;
+        private ConversationType conversationType;
 
         //self participant's AvModality
         private AVModality avModality;
@@ -25,7 +26,7 @@ namespace IGBGVirtualReceptionist
 
         public ContactInfo Contact { get; private set; }
 
-        public ConversationWindow(Conversation conversation, LyncClient client, ContactInfo contact)
+        public ConversationWindow(Conversation conversation, LyncClient client, ContactInfo contact, ConversationType conversationType)
         {
             InitializeComponent();
 
@@ -34,37 +35,11 @@ namespace IGBGVirtualReceptionist
             this.client = client;
             this.conversation = conversation;
             this.Contact = contact;
+            this.conversationType = conversationType;
 
             this.Title = contact.DisplayName;
 
             InitializeConversation();
-        }
-
-        public void InitiateAudioCall()
-        {
-            //starts an audio call or conference by connecting the AvModality
-            try
-            {
-                AsyncCallback callback = new AsyncOperationHandler(avModality.EndConnect).Callback;
-                avModality.BeginConnect(callback, null);
-            }
-            catch (LyncClientException lyncClientException)
-            {
-                Console.WriteLine("ConversationWindow Error:" + lyncClientException);
-            }
-            catch (SystemException systemException)
-            {
-                if (LyncModelExceptionHelper.IsLyncException(systemException))
-                {
-                    // Log the exception thrown by the Lync Model API.
-                    Console.WriteLine("ConversationWindow Error: " + systemException);
-                }
-                else
-                {
-                    // Rethrow the SystemException which did not come from the Lync Model API.
-                    throw;
-                }
-            }
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -80,7 +55,6 @@ namespace IGBGVirtualReceptionist
             //audioChannel.StateChanged -= audioChannel_StateChanged;
             //videoChannel.ActionAvailabilityChanged -= videoChannel_ActionAvailabilityChanged;
             //videoChannel.StateChanged -= videoChannel_StateChanged;
-
             //if the conversation is active, will end it
             if (conversation.State != ConversationState.Terminated)
             {
@@ -109,6 +83,33 @@ namespace IGBGVirtualReceptionist
             }
 
             base.OnClosing(e);
+        }
+ 
+        private void InitiateAudioCall()
+        {
+            //starts an audio call or conference by connecting the AvModality
+            try
+            {
+                AsyncCallback callback = new AsyncOperationHandler(avModality.EndConnect).Callback;
+                avModality.BeginConnect(callback, null);
+            }
+            catch (LyncClientException lyncClientException)
+            {
+                Console.WriteLine("ConversationWindow Error:" + lyncClientException);
+            }
+            catch (SystemException systemException)
+            {
+                if (LyncModelExceptionHelper.IsLyncException(systemException))
+                {
+                    // Log the exception thrown by the Lync Model API.
+                    Console.WriteLine("ConversationWindow Error: " + systemException);
+                }
+                else
+                {
+                    // Rethrow the SystemException which did not come from the Lync Model API.
+                    throw;
+                }
+            }
         }
 
         private void InitializeConversation()
@@ -163,6 +164,20 @@ namespace IGBGVirtualReceptionist
             sourceUri = new Uri(string.Format("pack://application:,,,/{0};component/{1}", assemblyFullName, @"Themes\IG.xamTileManager.xaml"));
 
             this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = sourceUri });
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            switch (this.conversationType)
+            {
+                case ConversationType.Audio:
+                    this.InitiateAudioCall();
+                    break;
+                case ConversationType.Text:
+                    break;
+                case ConversationType.Video:
+                    break;
+            }
         }
     }
 }
