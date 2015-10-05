@@ -110,6 +110,7 @@
     </Compile>
     <Compile Include="LyncCommunication\AsyncOperationHandler.cs" />
     <Compile Include="LyncCommunication\ContactInfo.cs" />
+    <Compile Include="LyncCommunication\ConversationType.cs" />
     <Compile Include="LyncCommunication\LyncModelExceptionHelper.cs" />
     <Compile Include="LyncCommunication\LyncService.cs" />
     <Compile Include="LyncCommunication\ConversationEventArgs.cs" />

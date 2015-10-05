@@ -8,11 +8,13 @@ namespace IGBGVirtualReceptionist.LyncCommunication
     {
         public Conversation Conversation { get; private set; }
         public ContactInfo ContactInfo { get; private set; }
+        public ConversationType ConversationType { get; private set; }
 
-        public ConversationEventArgs(Conversation conversation, ContactInfo contactInfo)
+        public ConversationEventArgs(Conversation conversation, ContactInfo contactInfo, ConversationType conversationType)
         {
             this.Conversation = conversation;
             this.ContactInfo = contactInfo;
+            this.ConversationType = conversationType;
         }
     }
 }
