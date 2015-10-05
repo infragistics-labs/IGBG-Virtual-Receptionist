@@ -17,7 +17,7 @@ namespace IGBGVirtualReceptionist.LyncCommunication
         private bool expertSearchEnabled = false;
         private IList<SearchProviders> activeSearchProviders;
         private ContactSubscription searchResultSubscription;
-        private Dictionary<Conversation, ConversationType> activeConversationsToConversationTypeMap;
+        private ConversationType currentConversationType;
 
         private List<Contact> favoriteContacts;
         private List<ContactInfo> favoriteContactInfos;
@@ -46,8 +46,6 @@ namespace IGBGVirtualReceptionist.LyncCommunication
 
         public LyncService()
         {
-            activeConversationsToConversationTypeMap = new Dictionary<Conversation, ConversationType>();
-
             this.Initialize();
         }
 
@@ -189,8 +187,8 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             Conversation conversation = null;
             try
             {
+                this.currentConversationType = conversationType;
                 conversation = client.ConversationManager.AddConversation();
-                this.activeConversationsToConversationTypeMap.Add(conversation, conversationType);
             }
             catch (LyncClientException e)
             {
@@ -489,15 +487,11 @@ namespace IGBGVirtualReceptionist.LyncCommunication
 
         private void ConversationManagerConversationRemoved(object sender, ConversationManagerEventArgs e)
         {
-            // Remove the conversation from active conversations map
-            var conversationType = this.activeConversationsToConversationTypeMap[e.Conversation];
-            this.activeConversationsToConversationTypeMap.Remove(e.Conversation);
-
             var handler = this.ConversationEnded;
             if (handler != null)
             {
                 var contactInfo = this.GetParticipantInfoFromConversation(e.Conversation);
-                handler(sender, new ConversationEventArgs(e.Conversation, contactInfo, conversationType));
+                handler(sender, new ConversationEventArgs(e.Conversation, contactInfo, this.currentConversationType));
             }
         }
 
@@ -506,9 +500,8 @@ namespace IGBGVirtualReceptionist.LyncCommunication
             var handler = this.ConversationStarted;
             if (handler != null)
             {
-                var conversationType = this.activeConversationsToConversationTypeMap[e.Conversation];
                 var contactInfo = this.GetParticipantInfoFromConversation(e.Conversation);
-                handler(sender, new ConversationEventArgs(e.Conversation, contactInfo, conversationType));
+                handler(sender, new ConversationEventArgs(e.Conversation, contactInfo, this.currentConversationType));
             }
         }
 

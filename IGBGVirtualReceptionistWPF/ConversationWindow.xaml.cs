@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using IGBGVirtualReceptionist.LyncCommunication;
 using Microsoft.Lync.Model;
@@ -93,7 +94,7 @@ namespace IGBGVirtualReceptionist
             // TODO: fix the UI
 
             //show the current conversation and modality states in the UI
-            this.conversationStatus.Text = conversation.State.ToString();
+            this.SetConversationStatus(conversation.State.ToString());
             this.SetModalityStatus(avModality.State.ToString());
             this.SetAudioStatus("Disconnected");
             this.SetVideoStatus("Disconnected");
@@ -214,16 +215,22 @@ namespace IGBGVirtualReceptionist
             }));
         }
 
+        private void SetConversationStatus(string status)
+        {
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
+                this.conversationStatus.Text = status;
+            }));
+        }
+
         private void ConversationStateChanged(object sender, ConversationStateChangedEventArgs e)
         {
-            //show the current conversation state
-            this.conversationStatus.Text = e.NewState.ToString();
+            this.SetConversationStatus(e.NewState.ToString());
         }
 
         private void AvModalityModalityStateChanged(object sender, ModalityStateChangedEventArgs e)
         {
-            //updates the status bar with the video channel state
-            this.modalityStatus.Text = e.NewState.ToString();
+            this.SetModalityStatus(e.NewState.ToString());
         }
 
         private void AvModalityActionAvailabilityChanged(object sender, ModalityActionAvailabilityChangedEventArgs e)
@@ -311,24 +318,29 @@ namespace IGBGVirtualReceptionist
             {
                 try
                 {
-                    //sets the properties required for the native video window to draw itself
-                    videoWindow.Owner = videoPanel.Handle.ToInt32();
-                    videoWindow.SetWindowPosition(0, 0, videoPanel.Width, videoPanel.Height);
+                    // TODO: setting videoWindow.Owner throws an exception. Fix it
 
-                    //gets the current window style to modify it
-                    long currentStyle = videoWindow.WindowStyle;
+                    ////sets the properties required for the native video window to draw itself
+                    //videoWindow.Owner = videoPanel.Handle.ToInt32();
+                    //videoWindow.SetWindowPosition(0, 0, videoPanel.Width, videoPanel.Height);
 
-                    //disables borders, sizebox, close button
-                    currentStyle = currentStyle & ~lDisableWindowStyles;
+                    ////gets the current window style to modify it
+                    //long currentStyle = videoWindow.WindowStyle;
 
-                    //enables styles for a child window
-                    currentStyle = currentStyle | lEnableWindowStyles;
+                    ////disables borders, sizebox, close button
+                    //currentStyle = currentStyle & ~lDisableWindowStyles;
 
-                    //updates the current window style
-                    videoWindow.WindowStyle = (int)currentStyle;
+                    ////enables styles for a child window
+                    //currentStyle = currentStyle | lEnableWindowStyles;
+
+                    ////updates the current window style
+                    //videoWindow.WindowStyle = (int)currentStyle;
 
                     //updates the visibility
                     videoWindow.Visible = OATRUE;
+
+                    videoWindow.Width = 300;
+                    videoWindow.Height = 300;
                 }
                 catch (Exception exception)
                 {
