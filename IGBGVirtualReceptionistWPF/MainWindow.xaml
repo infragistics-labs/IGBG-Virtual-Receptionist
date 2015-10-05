@@ -25,7 +25,7 @@
         <Label Grid.Column="1" FontSize="45" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Foreground="White">Welcome to Infragistics Sofia</Label>
         <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" Content="Most used contacts:" Foreground="White"/>
         <StackPanel  Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
-            <igEditors:XamMaskedEditor Name="searchBox" NullText="Search here - Type text and press Search Button..." PromptChar="" Width="300" Theme="IGTheme"/>
+            <igEditors:XamMaskedEditor Name="searchBox" NullText="Search here - Type text and press Search Button..." PromptChar="" Width="300" Theme="IGTheme" EditModeEnded="searchBox_EditModeEnded"/>
             <Button Name="btnSearch" Content="Search" Click="btnSearch_Click" Grid.Column="2" Grid.Row="2"/>
         </StackPanel>
         <ig:XamTileManager Name="favTiles" Grid.Row="3" Grid.Column="0" BorderBrush="Gray" MaximizedTileLimit="0">

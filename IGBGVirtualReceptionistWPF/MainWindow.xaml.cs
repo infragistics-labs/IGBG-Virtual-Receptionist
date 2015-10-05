@@ -150,6 +150,11 @@ namespace IGBGVirtualReceptionist
         {
             this.lyncService.StartSearchForContactsOrGroups(searchBox.Text);
         }
+
+        private void searchBox_EditModeEnded(object sender, Infragistics.Windows.Editors.Events.EditModeEndedEventArgs e)
+        {
+            this.lyncService.StartSearchForContactsOrGroups(searchBox.Text);
+        }
     }
 
 }
